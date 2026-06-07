@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("eVote360_Pro.Core.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3943c4b4033d18be327e4929fc37a48fd7caf856")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+795ed4019e9922900a104b86d49a62b0fcb94fd3")]
 [assembly: System.Reflection.AssemblyProductAttribute("eVote360_Pro.Core.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("eVote360_Pro.Core.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
