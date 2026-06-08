@@ -17,6 +17,7 @@ namespace eVote360_Pro.Persistence.Context
         public DbSet<Election> Elections => Set<Election>();
         public DbSet<VerificationCode> VerificationCodes => Set<VerificationCode>();
         public DbSet<CitizenParticipation> CitizenParticipations => Set<CitizenParticipation>();
+        public DbSet<Vote> Votes => Set<Vote>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
