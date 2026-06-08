@@ -14,7 +14,7 @@ namespace eVote360_Pro.Persistence.Context
         public DbSet<Candidate> Candidates => Set<Candidate>();
         public DbSet<PoliticalAlliance> PoliticalAlliances => Set<PoliticalAlliance>();
         public DbSet<CandidateOfficeAssignment> CandidateOfficeAssignments => Set<CandidateOfficeAssignment>();
-
+        public DbSet<Election> Elections => Set<Election>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
