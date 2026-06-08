@@ -7,6 +7,7 @@ namespace eVote360_Pro.Core.Domain.Entities
         public string Description {get; private set;}  = string.Empty;
         public bool IsActive {get; private set;}
 
+        protected ElectedOffice(){}
         public ElectedOffice(string name, string description)
         {
             Id = Guid.NewGuid();

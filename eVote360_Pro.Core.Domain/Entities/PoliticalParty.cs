@@ -9,6 +9,7 @@ namespace eVote360_Pro.Core.Domain.Entities
         public string Logo { get; private set; } = string.Empty;
         public bool IsActive { get; private set; }
 
+        protected PoliticalParty(){}
         public PoliticalParty(string name, string? description, string acronym, string logo)
         {
             Name = name.Trim();

@@ -11,6 +11,7 @@ namespace eVote360_Pro.Core.Domain.Entities
         public string DocumentNumber { get; private set; } = string.Empty;
         public bool IsActive { get; private set; }
 
+        protected Citizen(){}
         public Citizen(string name, string lastName, string email, string documentNumber)
         {
             Id = Guid.NewGuid();
