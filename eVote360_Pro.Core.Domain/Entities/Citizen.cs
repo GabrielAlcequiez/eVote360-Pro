@@ -24,10 +24,10 @@ namespace eVote360_Pro.Core.Domain.Entities
         public void Update(string name, string lastName, string email, string documentNumber, bool isActive)
         {
             Id = Guid.NewGuid();
-            Name = name;
-            LastName = lastName;
-            Email = email;
-            DocumentNumber = documentNumber;
+            Name = name.Trim();
+            LastName = lastName.Trim();
+            Email = email.Trim();
+            DocumentNumber = documentNumber.Trim();
             IsActive = isActive;
         }
 
