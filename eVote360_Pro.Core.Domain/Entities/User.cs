@@ -12,6 +12,10 @@ namespace eVote360_Pro.Core.Domain.Entities
         public string Password { get; private set; } = string.Empty;
         public Role Role { get; private set; }
         public bool IsActive { get; private set; }
+        
+        // Relación 1:1 - Un dirigente pertenece a un solo partido
+        // Es nullable porque un Administrador no tendrá esta asignación
+        public PartyLeader? PartyLeaderAssignment { get; private set; }
 
         protected User() { }
         public User(string name, string lastName, string email, string userName, string password, Role role)
