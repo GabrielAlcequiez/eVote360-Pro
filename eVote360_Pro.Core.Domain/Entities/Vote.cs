@@ -8,7 +8,7 @@ namespace eVote360_Pro.Core.Domain.Entities
         public Guid ElectionId { get; private set; }
         public Election Election { get; private set; } = null!;
 
-        public Guid ElectedOfficeId { get; private set; } 
+        public Guid ElectedOfficeId { get; private set; }
         public ElectedOffice ElectedOffice { get; private set; } = null!;
 
         // 
