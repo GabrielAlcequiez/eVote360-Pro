@@ -27,8 +27,9 @@ namespace eVote360_Pro.Persistence.EntitiesConfiguration
             builder.HasIndex(x=>x.DocumentNumber)
                 .IsUnique();
 
-
-
+            builder.Property(x=> x.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
         }
     }
 }

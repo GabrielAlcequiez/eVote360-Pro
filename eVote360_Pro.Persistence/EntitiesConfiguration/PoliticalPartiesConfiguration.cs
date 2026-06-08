@@ -21,6 +21,9 @@ namespace eVote360_Pro.Persistence.EntitiesConfiguration
 
             builder.Property(x => x.Logo)
                 .IsRequired();
+            
+            builder.Property(x=>x.Description)
+                .HasMaxLength(300);
 
             builder.Property(x=> x.IsActive)
                 .IsRequired()

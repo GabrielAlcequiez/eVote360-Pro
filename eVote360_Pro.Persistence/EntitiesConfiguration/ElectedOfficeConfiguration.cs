@@ -18,6 +18,10 @@ namespace eVote360_Pro.Persistence.EntitiesConfiguration
                 
             builder.Property(x => x.Description)
                 .IsRequired().HasMaxLength(300);
+
+            builder.Property(x=> x.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
         }
     }
 }
