@@ -1,0 +1,12 @@
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/bin/Debug/net9.0/eVote360_Pro.Core.Domain.deps.json
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/bin/Debug/net9.0/eVote360_Pro.Core.Domain.dll
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/bin/Debug/net9.0/eVote360_Pro.Core.Domain.pdb
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.AssemblyInfoInputs.cache
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.AssemblyInfo.cs
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.csproj.CoreCompileInputs.cache
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.sourcelink.json
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.dll
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/refint/eVote360_Pro.Core.Domain.dll
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/eVote360_Pro.Core.Domain.pdb
+/home/gxbbab/Projects/eVote360-Pro/eVote360_Pro.Core.Domain/obj/Debug/net9.0/ref/eVote360_Pro.Core.Domain.dll
