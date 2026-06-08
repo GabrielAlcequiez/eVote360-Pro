@@ -1,5 +1,9 @@
+using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.User;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddValidatorsFromAssemblyContaining<UserCreateValidator>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
