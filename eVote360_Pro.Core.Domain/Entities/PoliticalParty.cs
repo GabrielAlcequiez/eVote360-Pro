@@ -8,7 +8,7 @@ namespace eVote360_Pro.Core.Domain.Entities
         public string Acronym { get; private set; } = string.Empty;
         public string Logo { get; private set; } = string.Empty;
         public bool IsActive { get; private set; }
-        
+
         public ICollection<Candidate> Candidates { get; private set; } = new List<Candidate>();
         // relacion 1:1, para partido politico solo tiene un dirigente
         public PartyLeader? PartyLeader { get; private set; }
@@ -21,8 +21,14 @@ namespace eVote360_Pro.Core.Domain.Entities
             Logo = logo.Trim();
             IsActive = true;
         }
+        public void UpdateSafeFields(string? description, string logo, bool isActive)
+        {
+            Description = description;
+            Logo = logo.Trim();
+            IsActive = isActive;
+        }
 
-        public void Update(string name, string? description, string acronym, string logo, bool isActive)
+        public void UpdateAll(string name, string? description, string acronym, string logo, bool isActive)
         {
             Name = name.Trim();
             Description = description;
