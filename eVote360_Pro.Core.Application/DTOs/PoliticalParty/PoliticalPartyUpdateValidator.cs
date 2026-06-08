@@ -1,0 +1,24 @@
+using FluentValidation;
+
+namespace eVote360_Pro.Core.Application.DTOs.PoliticalParty
+{
+    public class PoliticalPartyUpdateValidator : AbstractValidator<PoliticalPartyUpdateDto>
+    {
+        public PoliticalPartyUpdateValidator()
+        {
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("El ID del partido es requerido.");
+
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("El nombre del partido es requerido.")
+                .MaximumLength(150).WithMessage("El nombre no puede superar los 150 caracteres.");
+
+            RuleFor(x => x.Description)
+                .MaximumLength(500).WithMessage("La descripción no puede superar los 500 caracteres.");
+
+            RuleFor(x => x.Acronym)
+                .NotEmpty().WithMessage("El acrónimo es requerido.")
+                .MaximumLength(10).WithMessage("El acrónimo no puede superar los 10 caracteres.");
+        }
+    }
+}
