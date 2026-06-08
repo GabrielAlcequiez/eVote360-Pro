@@ -10,4 +10,8 @@
     <ProjectReference Include="../eVote360_Pro.Core.Domain/eVote360_Pro.Core.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+  </ItemGroup>
+
 </Project>
