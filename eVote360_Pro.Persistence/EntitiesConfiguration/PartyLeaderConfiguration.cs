@@ -10,25 +10,20 @@ namespace eVote360_Pro.Persistence.EntitiesConfiguration
         {
             builder.ToTable("PartyLeaders");
 
-            // composite primary key
-            builder.HasKey(x => new { x.PartyLeaderId, x.PoliticalPartyId });
-
-            builder.HasIndex(x => x.PartyLeaderId)
-                .IsUnique();
+            builder.HasKey(x => x.UserId);
 
             builder.HasIndex(x => x.PoliticalPartyId)
                 .IsUnique();
 
             builder.HasOne(x => x.User)
-                .WithOne() 
-                .HasForeignKey<PartyLeader>(x => x.PartyLeaderId)
-                .OnDelete(DeleteBehavior.Restrict); 
-
-            builder.HasOne(x => x.PoliticalParty)
-                .WithOne() 
-                .HasForeignKey<PartyLeader>(x => x.PoliticalPartyId)
+                .WithOne(x => x.PartyLeader)
+                .HasForeignKey<PartyLeader>(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(x => x.PoliticalParty)
+                .WithOne(x => x.PartyLeader)
+                .HasForeignKey<PartyLeader>(x => x.PoliticalPartyId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

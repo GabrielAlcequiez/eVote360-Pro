@@ -11,7 +11,7 @@ namespace eVote360_Pro.Core.Domain.Entities
         
         public ICollection<Candidate> Candidates { get; private set; } = new List<Candidate>();
         // relacion 1:1, para partido politico solo tiene un dirigente
-        public PartyLeader? PartyLeaderAssignment { get; private set; }
+        public PartyLeader? PartyLeader { get; private set; }
         protected PoliticalParty() { }
         public PoliticalParty(string name, string? description, string acronym, string logo)
         {
