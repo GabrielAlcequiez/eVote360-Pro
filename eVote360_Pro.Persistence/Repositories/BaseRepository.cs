@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.Persistence.Context;
@@ -46,15 +47,28 @@ namespace eVote360_Pro.Persistence.Repositories
             return await _context.Set<T>().FindAsync(id);
         }
 
-        //PENDIENTES
-        public Task<T?> SoftDeleteAsync(Guid id)
+        public async Task<T?> SoftDeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.Set<T>().FindAsync(id);
+            if (entity == null) return null;
+
+            var entry = _context.Entry(entity);
+            var property = entry.Metadata.FindProperty("IsActive");
+            if (property != null && property.ClrType == typeof(bool))
+            {
+                entry.Property("IsActive").CurrentValue = false;
+                entry.State = EntityState.Modified;
+            }
+            return entity;
         }
 
-        public Task<T?> UpdateAsync(Guid id, T entity)
+        public async Task<T?> UpdateAsync(Guid id, T entity)
         {
-            throw new NotImplementedException();
+            var existing = await _context.Set<T>().FindAsync(id);
+            if (existing == null) return null;
+
+            _context.Entry(existing).CurrentValues.SetValues(entity);
+            return existing;
         }
     }
 }
