@@ -7,6 +7,7 @@ namespace eVote360_Pro.Persistence.Context
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         public DbSet<ElectedOffice> ElectedOffices => Set<ElectedOffice>();
+        public DbSet<Citizen> Citizens => Set<Citizen>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
