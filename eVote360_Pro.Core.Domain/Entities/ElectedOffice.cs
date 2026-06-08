@@ -7,7 +7,6 @@ namespace eVote360_Pro.Core.Domain.Entities
         public string Description { get; private set; } = string.Empty;
         public bool IsActive { get; private set; }
 
-        public ICollection<Candidate> Candidates { get; private set; } = new List<Candidate>();
         protected ElectedOffice() { }
         public ElectedOffice(string name, string description)
         {

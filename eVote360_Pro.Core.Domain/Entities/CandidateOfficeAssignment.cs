@@ -19,7 +19,6 @@ namespace eVote360_Pro.Core.Domain.Entities
         public CandidacyType Type { get; private set; } // Propio o Aliado
         public DateTime CreatedAt { get; private set; } // No necesario, pero util
 
-
         protected CandidateOfficeAssignment() { }
         public CandidateOfficeAssignment(Guid electedOfficeId, Guid candidateId, Guid politicalPartyId, Guid candidateOwnerPartyId)
         {
@@ -27,7 +26,7 @@ namespace eVote360_Pro.Core.Domain.Entities
             ElectedOfficeId = electedOfficeId;
             CandidateId = candidateId;
             PoliticalPartyId = politicalPartyId;
-            CreatedAt = DateTime.UtcNow; 
+            CreatedAt = DateTime.UtcNow;
 
             Type = (politicalPartyId == candidateOwnerPartyId) ? CandidacyType.Standard : CandidacyType.Alliance;
         }
