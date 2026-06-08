@@ -60,6 +60,7 @@ Antes de dividirse, ambos integrantes configuran las bases del proyecto para evi
 
 #### Asignación de Candidato a Puesto
 - Lógica para asignar candidatos propios a posiciones disponibles.
+- Lógica para permitir que un partido asigne a un candidato de un partido aliado (alianza activa).
 - Validación: un candidato no puede ocupar más de un puesto.
 
 ---
@@ -69,9 +70,9 @@ Antes de dividirse, ambos integrantes configuran las bases del proyecto para evi
 #### Asignación de Dirigentes
 - Módulo administrativo para vincular un usuario con rol `Dirigente` a un partido político.
 
-#### Alianzas Políticas y Candidatos Aliados
+#### Alianzas Políticas
 - Sistema de solicitudes de alianza con tres estados: `En espera`, `Aceptada`, `Rechazada`.
-- Lógica para permitir que un partido asigne a un candidato de un partido aliado.
+- Nota: La postulación y asignación de candidatos de partidos aliados es responsabilidad de la Persona A.
 
 ---
 
