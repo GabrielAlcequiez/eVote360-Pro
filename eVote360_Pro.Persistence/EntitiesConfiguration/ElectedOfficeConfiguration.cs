@@ -9,7 +9,7 @@ namespace eVote360_Pro.Persistence.EntitiesConfiguration
         public void Configure(EntityTypeBuilder<ElectedOffice> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.ToTable("ElectedOffice");
+            builder.ToTable("ElectedOffices");
 
             builder.Property(x => x.Name)
                 .IsRequired().HasMaxLength(150); // tamaño no especificado en documento

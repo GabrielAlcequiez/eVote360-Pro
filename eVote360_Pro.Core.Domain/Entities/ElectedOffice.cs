@@ -10,15 +10,15 @@ namespace eVote360_Pro.Core.Domain.Entities
         public ElectedOffice(string name, string description)
         {
             Id = Guid.NewGuid();
-            Name = name;
-            Description = description;
+            Name = name.Trim();
+            Description = description.Trim();
             IsActive = true;
         }
 
         public void Update(string name, string description, bool isActive)
         {
-            Name = name;
-            Description = description;
+            Name = name.Trim();
+            Description = description.Trim();
             IsActive = isActive;
         }
     }
