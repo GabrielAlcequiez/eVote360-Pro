@@ -1,6 +1,7 @@
 using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.CandidateOfficeAssignment;
 
-namespace eVote360_Pro.Core.Application.DTOs.CandidateOfficeAssignment
+namespace eVote360_Pro.Core.Application.Validators.CandidateOfficeAssignment
 {
     public class CandidateOfficeAssignmentCreateValidator : AbstractValidator<CandidateOfficeAssignmentCreateDto>
     {

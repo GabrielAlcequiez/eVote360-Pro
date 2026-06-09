@@ -1,6 +1,7 @@
 using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.Vote;
 
-namespace eVote360_Pro.Core.Application.DTOs.Vote
+namespace eVote360_Pro.Core.Application.Validators.Vote
 {
     public class VoteCreateValidator : AbstractValidator<VoteCreateDto>
     {

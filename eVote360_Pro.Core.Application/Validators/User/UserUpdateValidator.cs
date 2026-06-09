@@ -1,6 +1,7 @@
 using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.User;
 
-namespace eVote360_Pro.Core.Application.DTOs.User
+namespace eVote360_Pro.Core.Application.Validators.User
 {
     public class UserUpdateValidator : AbstractValidator<UserUpdateDto>
     {

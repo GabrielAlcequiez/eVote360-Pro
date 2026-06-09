@@ -1,6 +1,7 @@
 using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.PartyLeader;
 
-namespace eVote360_Pro.Core.Application.DTOs.PartyLeader
+namespace eVote360_Pro.Core.Application.Validators.PartyLeader
 {
     public class PartyLeaderCreateValidator : AbstractValidator<PartyLeaderCreateDto>
     {

@@ -1,5 +1,5 @@
 using FluentValidation;
-using eVote360_Pro.Core.Application.DTOs.User;
+using eVote360_Pro.Core.Application.Validators.User;
 using eVote360_Pro.Persistence;
 
 

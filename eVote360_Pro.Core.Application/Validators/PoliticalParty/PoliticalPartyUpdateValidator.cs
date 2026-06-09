@@ -1,6 +1,7 @@
 using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.PoliticalParty;
 
-namespace eVote360_Pro.Core.Application.DTOs.PoliticalParty
+namespace eVote360_Pro.Core.Application.Validators.PoliticalParty
 {
     public class PoliticalPartyUpdateValidator : AbstractValidator<PoliticalPartyUpdateDto>
     {

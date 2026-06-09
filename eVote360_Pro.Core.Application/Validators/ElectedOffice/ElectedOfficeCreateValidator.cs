@@ -1,14 +1,12 @@
 using FluentValidation;
+using eVote360_Pro.Core.Application.DTOs.ElectedOffice;
 
-namespace eVote360_Pro.Core.Application.DTOs.ElectedOffice
+namespace eVote360_Pro.Core.Application.Validators.ElectedOffice
 {
-    public class ElectedOfficeUpdateValidator : AbstractValidator<ElectedOfficeUpdateDto>
+    public class ElectedOfficeCreateValidator : AbstractValidator<ElectedOfficeCreateDto>
     {
-        public ElectedOfficeUpdateValidator()
+        public ElectedOfficeCreateValidator()
         {
-            RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("El ID del cargo electivo es requerido.");
-
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("El nombre del cargo electivo es requerido.")
                 .MaximumLength(150).WithMessage("El nombre no puede superar los 150 caracteres.");
