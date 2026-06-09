@@ -1,10 +1,12 @@
 using FluentValidation;
 using eVote360_Pro.Core.Application.Validators.User;
+using eVote360_Pro.Core.Application;
 using eVote360_Pro.Persistence;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddApplicationLayer();
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
 
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateValidator>();
