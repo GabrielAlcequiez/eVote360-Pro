@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\eVote360_Pro.Core.Application\eVote360_Pro.Core.Application.csproj" />
+    <ProjectReference Include="..\eVote360_Pro.Persistence\eVote360_Pro.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
