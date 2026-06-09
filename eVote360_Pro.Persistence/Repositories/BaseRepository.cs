@@ -26,7 +26,6 @@ namespace eVote360_Pro.Persistence.Repositories
         public async Task<List<T>?> AddRangeAsync(List<T> entities)
         {
             await _context.Set<T>().AddRangeAsync(entities);
-            await _context.SaveChangesAsync();
             return entities;
         }
 
@@ -34,8 +33,6 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return _context.Set<T>().AsNoTracking();
         }
-
-
 
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
