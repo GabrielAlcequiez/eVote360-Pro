@@ -1,0 +1,166 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using eVote360_Pro.Core.Application.DTOs.User;
+using eVote360_Pro.Core.Application.Helpers;
+using eVote360_Pro.Core.Application.Interfaces;
+using eVote360_Pro.Core.Domain.Entities;
+using eVote360_Pro.Core.Domain.Interfaces;
+using eVote360_Pro.Core.Domain.Common.Enums;
+
+namespace eVote360_Pro.Core.Application.Services
+{
+    public class UserService : IUserService
+    {
+        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly IBaseRepository<Election> _electionRepository;
+        private readonly IBaseRepository<PartyLeader> _partyLeaderRepository;
+
+        public UserService(
+            IUserRepository userRepository, 
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            IBaseRepository<Election> electionRepository,
+            IBaseRepository<PartyLeader> partyLeaderRepository)
+        {
+            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _electionRepository = electionRepository;
+            _partyLeaderRepository = partyLeaderRepository;
+        }
+
+        private async Task ValidateNoActiveElectionAsync(string actionMessage)
+        {
+            var elections = await _electionRepository.GetAllAsync();
+            if (elections != null && elections.Any(e => e.Status == ElectionStatus.Active))
+            {
+                throw new InvalidOperationException($"No se puede {actionMessage} un usuario mientras exista una elección activa.");
+            }
+        }
+
+        public async Task<UserGetDto> AddAsync(UserCreateDto dto)
+        {
+            await ValidateNoActiveElectionAsync("crear");
+
+            var cleanUsername = dto.Username.Trim();
+            var existingByUsername = await _userRepository.GetByUsernameAsync(cleanUsername);
+            if (existingByUsername != null)
+            {
+                throw new InvalidOperationException("Ya existe un usuario registrado con este nombre de usuario.");
+            }
+
+            var cleanEmail = dto.Email.Trim();
+            var existingByEmail = await _userRepository.GetByEmailAsync(cleanEmail);
+            if (existingByEmail != null)
+            {
+                throw new InvalidOperationException("Ya existe un usuario registrado con este correo electrónico.");
+            }
+
+            var hashedPassword = PasswordHelper.HashPassword(dto.Password);
+
+            var user = new User(
+                dto.Name,
+                dto.LastName,
+                cleanEmail,
+                cleanUsername,
+                hashedPassword,
+                dto.Role
+            );
+
+            await _userRepository.AddAsync(user);
+            await _unitOfWork.CompleteAsync();
+
+            return _mapper.Map<UserGetDto>(user);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            await ValidateNoActiveElectionAsync("desactivar");
+
+            _ = await _userRepository.SoftDeleteAsync(id) ?? throw new KeyNotFoundException($"Usuario con ID {id} no encontrado.");
+
+            await _unitOfWork.CompleteAsync();
+        }
+
+        public async Task<List<UserGetDto>> GetAllAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return _mapper.Map<List<UserGetDto>>(users);
+        }
+
+        public async Task<UserGetDto?> GetByIdAsync(Guid id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null) return null;
+
+            return _mapper.Map<UserGetDto>(user);
+        }
+
+        public async Task<UserGetDto?> LoginAsync(string username, string password)
+        {
+            var cleanUsername = username.Trim();
+            var user = await _userRepository.GetByUsernameAsync(cleanUsername);
+            if (user == null || !user.IsActive) return null;
+
+            if (!PasswordHelper.VerifyPassword(password, user.Password))
+                return null;
+
+            return _mapper.Map<UserGetDto>(user);
+        }
+
+            return _mapper.Map<UserGetDto>(user);
+        }
+
+        public async Task UpdateAsync(UserUpdateDto dto)
+        {
+            await ValidateNoActiveElectionAsync("editar");
+
+            var user = await _userRepository.GetByIdAsync(dto.Id) ?? throw new KeyNotFoundException($"Usuario con ID {dto.Id} no encontrado.");
+
+            var cleanUsername = dto.Username.Trim();
+            var existingByUsername = await _userRepository.GetByUsernameAsync(cleanUsername);
+            if (existingByUsername != null && existingByUsername.Id != dto.Id)
+            {
+                throw new InvalidOperationException("Ya existe un usuario registrado con este nombre de usuario.");
+            }
+
+            var cleanEmail = dto.Email.Trim();
+            var existingByEmail = await _userRepository.GetByEmailAsync(cleanEmail);
+            if (existingByEmail != null && existingByEmail.Id != dto.Id)
+            {
+                throw new InvalidOperationException("Ya existe un usuario registrado con este correo electrónico.");
+            }
+
+            if (user.Role == Role.PoliticalLeader && dto.Role == Role.Administrator)
+            {
+                var assignedParty = await _partyLeaderRepository.GetByIdAsync(user.Id);
+                if (assignedParty != null)
+                {
+                    throw new InvalidOperationException("No se puede cambiar el rol de este usuario porque tiene un partido político asignado como dirigente.");
+                }
+            }
+
+            var passwordToSave = string.IsNullOrEmpty(dto.Password) 
+                ? user.Password 
+                : PasswordHelper.HashPassword(dto.Password);
+
+            user.Update(
+                dto.Name,
+                dto.LastName,
+                cleanEmail,
+                cleanUsername,
+                passwordToSave,
+                dto.Role,
+                dto.IsActive
+            );
+
+            await _userRepository.UpdateAsync(user.Id, user);
+            await _unitOfWork.CompleteAsync();
+        }
+    }
+}
