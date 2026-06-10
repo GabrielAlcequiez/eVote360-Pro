@@ -13,6 +13,12 @@ builder.Services.AddPersistenceInfrastructure(builder.Configuration);
 // Registrar validadores de FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateValidator>();
 
+// AutoMapper acá en Web
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(Program).Assembly);
+});
+
 // Configurar Autenticación por Cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
