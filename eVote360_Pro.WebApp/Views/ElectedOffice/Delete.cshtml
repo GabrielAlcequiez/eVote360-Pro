@@ -1,0 +1,58 @@
+@model ElectedOfficeGetViewModel
+@{
+    ViewData["Title"] = "Eliminar Puesto Electivo";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+                <a asp-action="Index" class="text-decoration-none text-muted" style="font-size: 0.9rem;">
+                    ← Volver al listado
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 20px; background: #ffffff;">
+                <div class="mb-4">
+                    <h2 class="h3 font-weight-bold mb-1" style="color: #0f172a; font-weight: 700;">@ViewData["Title"]</h2>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">¿Estás seguro de que deseas desactivar este puesto electivo?</p>
+                </div>
+
+                <div class="alert alert-warning border-0 p-3 mb-4" style="border-radius: 12px; background-color: rgba(255, 193, 7, 0.1); color: #856404; font-size: 0.9rem;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Esta acción desactivará el puesto electivo. Los datos no se eliminarán permanentemente.
+                </div>
+
+                <div class="mb-4 p-4" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1" style="font-size: 0.8rem;">NOMBRE</span>
+                        <span class="fw-semibold" style="color: #0f172a;">@Model.Name</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1" style="font-size: 0.8rem;">DESCRIPCIÓN</span>
+                        <span style="color: #475569;">@Model.Description</span>
+                    </div>
+
+                    <div>
+                        <span class="text-muted small d-block mb-1" style="font-size: 0.8rem;">ESTADO</span>
+                        <span class="badge rounded-pill @(Model.IsActive ? "bg-success-subtle text-success border border-success" : "bg-danger-subtle text-danger border border-danger")">
+                            @(Model.IsActive ? "Activo" : "Inactivo")
+                        </span>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="d-flex justify-content-end gap-3">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 10px;">Cancelar</a>
+                        <button type="submit" class="btn btn-danger px-4 py-2" style="border-radius: 10px;">
+                            <i class="bi bi-trash3 me-2"></i> Desactivar puesto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
