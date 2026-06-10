@@ -5,6 +5,8 @@ using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.Core.Domain.Common.Enums;
+using FluentValidation;
+using eVote360_Pro.Core.Application.Validators.User;
 
 namespace eVote360_Pro.Core.Application.Services
 {
@@ -15,25 +17,38 @@ namespace eVote360_Pro.Core.Application.Services
         private readonly IMapper _mapper;
         private readonly IElectionRepository _electionRepository;
         private readonly IBaseRepository<PartyLeader> _partyLeaderRepository;
+        //validators
+        private readonly IValidator<UserCreateDto> _createValidator;
+        private readonly IValidator<UserUpdateDto> _updateValidator;
 
         public UserService(
             IUserRepository userRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IElectionRepository electionRepository,
-            IBaseRepository<PartyLeader> partyLeaderRepository)
+            IBaseRepository<PartyLeader> partyLeaderRepository,
+            IValidator<UserCreateDto> createValidator,
+            IValidator<UserUpdateDto> updateValidator
+        )
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _electionRepository = electionRepository;
             _partyLeaderRepository = partyLeaderRepository;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
+
         }
 
         public async Task<UserGetDto> AddAsync(UserCreateDto dto)
         {
+            ArgumentNullException.ThrowIfNull(dto);
+            await _createValidator.ValidateAndThrowAsync(dto);
+
             if (await _electionRepository.ValidateNoActiveElectionAsync())
                 throw new InvalidOperationException("No se puede realizar esta operación mientras exista una elección activa");
+
 
             var cleanUsername = dto.Username.Trim();
             var existingByUsername = await _userRepository.GetByUsernameAsync(cleanUsername);
@@ -104,7 +119,10 @@ namespace eVote360_Pro.Core.Application.Services
 
         public async Task UpdateAsync(UserUpdateDto dto)
         {
-            if(await _electionRepository.ValidateNoActiveElectionAsync())
+             ArgumentNullException.ThrowIfNull(dto);
+            await _updateValidator.ValidateAndThrowAsync(dto);
+            
+            if (await _electionRepository.ValidateNoActiveElectionAsync())
                 throw new InvalidOperationException("No se puede realizar esta operación mientras exista una elección activa");
 
             var user = await _userRepository.GetByIdAsync(dto.Id) ?? throw new KeyNotFoundException($"Usuario con ID {dto.Id} no encontrado.");
