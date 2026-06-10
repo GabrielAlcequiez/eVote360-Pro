@@ -69,7 +69,7 @@ namespace eVote360_Pro.Core.Application.Services
 
         }
 
-        public async Task<List<ElectedOfficeGetDto>> GetAllAsync()
+        public async Task<IReadOnlyList<ElectedOfficeGetDto>> GetAllAsync()
         {
             var electedOffices = await _repository.GetAllAsync();
             return _mapper.Map<List<ElectedOfficeGetDto>>(electedOffices);
