@@ -1,12 +1,16 @@
 using FluentValidation;
 using eVote360_Pro.Core.Application.DTOs.Citizen;
+using eVote360_Pro.Core.Domain.Interfaces;
 
 namespace eVote360_Pro.Core.Application.Validators.Citizen
 {
     public class CitizenUpdateValidator : AbstractValidator<CitizenUpdateDto>
     {
-        public CitizenUpdateValidator()
+        private readonly ICitizenRepository _repository;
+        public CitizenUpdateValidator(ICitizenRepository repository)
         {
+            _repository = repository;
+
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("El ID del ciudadano es requerido.");
 
@@ -21,11 +25,27 @@ namespace eVote360_Pro.Core.Application.Validators.Citizen
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("El correo electrónico es requerido.")
                 .EmailAddress().WithMessage("El formato del correo electrónico no es válido.")
-                .MaximumLength(150).WithMessage("El correo no puede superar los 150 caracteres.");
+                .MaximumLength(150).WithMessage("El correo no puede superar los 150 caracteres.")
+                .MustAsync(BeUniqueEmail)
+                .WithMessage("Ya hay ciudadano registrado con este email.");
 
             RuleFor(x => x.DocumentNumber)
                 .NotEmpty().WithMessage("El número de documento es requerido.")
-                .MaximumLength(20).WithMessage("El número de documento no puede superar los 20 caracteres.");
+                .MaximumLength(20).WithMessage("El número de documento no puede superar los 20 caracteres.")
+                .MustAsync(BeUniqueDocumentNumber)
+                .WithMessage("Ya hay un ciudadano registrado con este número de documento");
+        }
+
+        private async Task<bool>BeUniqueEmail(CitizenUpdateDto dto, string email, CancellationToken ct)
+        {
+            var existing = await _repository.GetByEmail(email.Trim());
+            return existing == null || existing.Id == dto.Id;
+        }
+
+        private async Task<bool>BeUniqueDocumentNumber(CitizenUpdateDto dto, string documentNumber, CancellationToken ct)
+        {
+            var existing = await _repository.GetByDocumentNumber(documentNumber.Trim());
+            return existing == null || existing.Id == dto.Id;
         }
     }
 }
