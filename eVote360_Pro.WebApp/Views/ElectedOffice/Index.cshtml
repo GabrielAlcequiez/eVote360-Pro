@@ -1,70 +1,140 @@
-﻿@model List<ElectedOfficeGetViewModel>
+﻿@model IReadOnlyList<ElectedOfficeGetViewModel>
 @{
-    ViewData["Title"] = "Puestos Electorales";
+    ViewData["Title"] = "Mantenimiento de Puestos Electivos";
+    bool hasActiveElection = ViewBag.HasActiveElection;
 }
 
-<div class="row">
-    <div>
-        <h1 class="display-4 text-center">Listado de Puestos Electivos</h1>
-    </div>
-</div>
-
-<div class="container-fluid px-4">
-     <div class="d-flex justify-content-between align-items-center my-4">
-        <h2 class="text-secondary fw-bold">Mantenimiento de Puestos Electivos</h2>
-        <a asp-controller="ElectedOffice" asp-action="Create" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-circle-fill me-2"></i>Registrar Puesto Electivo
-        </a>
-    </div>
-
-    <div class="row g-4 mt-2">
-        @if (!Model.Any())
-        {
-            <div class="col-12 text-center text-muted py-5">
-                <i class="bi bi-person-badge display-1 d-block mb-3"></i>
-                <p>No hay puestos electivos registrados en el sistema actualmente.</p>
-            </div>
-        }
-        else
-        {
-            @foreach (var electedOffice in Model)
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 font-weight-bold mb-1" style="color: #0f172a;">@ViewData["Title"]</h1>
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">Administra los cargos electivos disponibles en el sistema.</p>
+        </div>
+        <div>
+            @if (hasActiveElection)
             {
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card h-100 shadow-sm border-0 position-relative">
-
-                        <span class="position-absolute top-0 end-0 m-3 badge rounded-pill @(electedOffice.IsActive ? "bg-success-subtle text-success border border-success" : "bg-danger-subtle text-danger border border-danger")">
-                            @(electedOffice.IsActive ? "Activo" : "Inactivo")
-                        </span>
-
-                        <div class="card-body d-flex flex-column pt-4">
-                            <span class="text-uppercase text-muted fw-bold small tracking-wider mb-1">
-                                @electedOffice.Name
-                            </span>
-
-                            <p class="card-text text-muted small mb-4 flex-grow-1" title="@electedOffice.Description">
-                                @electedOffice.Description
-                            </p>
-
-                            <div class="pt-2 border-top">
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <a asp-action="Edit" asp-route-id="@electedOffice.Id" class="btn btn-sm btn-outline-warning w-100 d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-pencil-square me-2"></i> Editar
-                                        </a>
-                                    </div>
-                                    <div class="col-6">
-                                        <a asp-action="Delete" asp-route-id="@electedOffice.Id" class="btn btn-sm btn-outline-danger w-100 d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-trash3 me-2"></i> Eliminar
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+                <button class="btn btn-secondary px-4 py-2" style="border-radius: 10px; cursor: not-allowed;" disabled>
+                    + Crear puesto electivo
+                </button>
             }
-        }
+            else
+            {
+                <a asp-action="Create" class="btn btn-primary px-4 py-2" style="border-radius: 10px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); border: none;">
+                    + Crear puesto electivo
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (hasActiveElection)
+    {
+        <div class="alert alert-warning border-0 shadow-sm mb-4 d-flex align-items-center gap-3" style="border-radius: 12px; background-color: rgba(245, 158, 11, 0.1); color: #b45309;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            <div>
+                <strong style="font-weight: 600;">Modificaciones Bloqueadas:</strong> No se pueden modificar puestos electivos mientras exista una elección activa.
+            </div>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: rgba(16, 185, 129, 0.1); color: #065f46;" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: rgba(239, 68, 68, 0.1); color: #991b1b;" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden; background: #ffffff;">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0" style="font-size: 0.95rem;">
+                <thead class="bg-light" style="color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.8px;">
+                    <tr>
+                        <th class="px-4 py-3">Nombre</th>
+                        <th class="py-3">Descripción</th>
+                        <th class="py-3">Estado</th>
+                        <th class="px-4 py-3 text-end" style="width: 250px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #334155;">
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <p class="mb-0">No hay puestos electivos registrados en el sistema.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var office in Model)
+                        {
+                            <tr class="border-bottom" style="transition: background 0.2s ease;">
+                                <td class="px-4 py-3">
+                                    <div class="font-weight-medium" style="color: #0f172a; font-weight: 500;">@office.Name</div>
+                                </td>
+                                <td class="py-3 text-muted">@office.Description</td>
+                                <td class="py-3">
+                                    @if (office.IsActive)
+                                    {
+                                        <span class="d-inline-flex align-items-center gap-2" style="color: #10b981; font-weight: 500;">
+                                            <span style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block;"></span>
+                                            Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="d-inline-flex align-items-center gap-2" style="color: #64748b; font-weight: 500;">
+                                            <span style="width: 8px; height: 8px; background-color: #64748b; border-radius: 50%; display: inline-block;"></span>
+                                            Inactivo
+                                        </span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3 text-end">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        @if (hasActiveElection)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary px-3" style="border-radius: 8px; cursor: not-allowed;" disabled>Editar</button>
+                                            <button class="btn btn-sm btn-outline-secondary px-3" style="border-radius: 8px; cursor: not-allowed;" disabled>
+                                                @(office.IsActive ? "Desactivar" : "Activar")
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@office.Id" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 8px;">Editar</a>
+
+                                            <form asp-action="ToggleStatus" asp-route-id="@office.Id" method="post" class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                @if (office.IsActive)
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px;" onclick="return confirm('¿Está seguro de desactivar este puesto electivo?')">
+                                                        Desactivar
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
+                                                        Activar
+                                                    </button>
+                                                }
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
