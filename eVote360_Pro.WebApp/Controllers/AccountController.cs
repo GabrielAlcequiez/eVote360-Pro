@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Common.Enums;
 using eVote360_Pro.Core.Domain.Entities;
@@ -12,7 +7,6 @@ using eVote360_Pro.WebApp.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.EntityFrameworkCore;
 
 namespace eVote360_Pro.WebApp.Controllers
