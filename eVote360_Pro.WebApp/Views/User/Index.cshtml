@@ -1,7 +1,7 @@
-@model List<eVote360_Pro.Core.Application.DTOs.User.UserGetDto>
+@model eVote360_Pro.WebApp.Models.UserIndexViewModel
 @{
     ViewData["Title"] = "Mantenimiento de Usuarios";
-    bool hasActiveElection = ViewBag.HasActiveElection ?? false;
+    bool hasActiveElection = Model.HasActiveElection;
 }
 
 <div class="container py-4">
@@ -71,7 +71,7 @@
                     </tr>
                 </thead>
                 <tbody style="color: #334155;">
-                    @if (Model == null || !Model.Any())
+                    @if (Model.Users == null || !Model.Users.Any())
                     {
                         <tr>
                             <td colspan="6" class="text-center py-5 text-muted">
@@ -81,13 +81,13 @@
                     }
                     else
                     {
-                        @foreach (var user in Model)
+                        @foreach (var user in Model.Users)
                         {
                             <tr class="border-bottom" style="transition: background 0.2s ease;">
                                 <td class="px-4 py-3">
                                     <div class="font-weight-medium" style="color: #0f172a; font-weight: 500;">@user.FullName</div>
                                 </td>
-                                <td class="py-3 text-muted">@user.Username</td>
+                                <td class="py-3 text-muted">@@@user.Username</td>
                                 <td class="py-3">@user.Email</td>
                                 <td class="py-3">
                                     @if (user.Role == eVote360_Pro.Core.Domain.Common.Enums.Role.Administrator)
