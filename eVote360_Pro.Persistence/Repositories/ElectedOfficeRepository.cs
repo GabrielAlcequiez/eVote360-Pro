@@ -1,3 +1,4 @@
+using eVote360_Pro.Core.Domain.Common.Enums;
 using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.Persistence.Context;
@@ -10,6 +11,18 @@ namespace eVote360_Pro.Persistence.Repositories
         public async Task<ElectedOffice?> GetByName(string name)
         {
             return await _context.ElectedOffices.FirstOrDefaultAsync(u => u.Name == name);
+        }
+
+        public async Task<bool> HasActiveCandidatesAssignedAsync(Guid id)
+        {
+            return await _context.CandidateOfficeAssignments.Where(x => x.ElectedOfficeId == id).AnyAsync(x => x.Candidate.IsActive == true);
+
+        }
+
+        public async Task<bool> HasBeenUsedInElectionAsync(Guid id)
+        {
+            return await _context.Votes.AnyAsync(x=>x.ElectedOfficeId == id);
+
         }
     }
 }

@@ -9,6 +9,7 @@ namespace eVote360_Pro.Core.Application.Profiles
         public ElectedOfficeProfile()
         {
             CreateMap<ElectedOffice, ElectedOfficeGetDto>();
+            CreateMap<ElectedOfficeGetDto, ElectedOfficeUpdateDto>();
         }
     }
 }

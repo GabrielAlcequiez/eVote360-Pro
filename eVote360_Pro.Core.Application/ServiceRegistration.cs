@@ -11,6 +11,7 @@ namespace eVote360_Pro.Core.Application
             // Registrar los servicios de la capa de aplicación
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IElectedOfficeService, ElectedOfficeService>();
+            services.AddTransient<ICitizenService, CitizenService>();
         }
     }
 }

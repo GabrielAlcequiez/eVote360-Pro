@@ -1,7 +1,6 @@
 using FluentValidation;
 using eVote360_Pro.Core.Application.DTOs.ElectedOffice;
 using eVote360_Pro.Core.Domain.Interfaces;
-using System.Security.Cryptography.X509Certificates;
 
 namespace eVote360_Pro.Core.Application.Validators.ElectedOffice
 {
