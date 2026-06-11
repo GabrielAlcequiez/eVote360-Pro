@@ -64,6 +64,9 @@ namespace eVote360_Pro.Core.Application.Services
             var entity = await _repository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException("Puesto electoral no encontrado");
 
+            if (await _repository.HasActiveCandidatesAssignedAsync(id))
+                throw new InvalidOperationException("No se puede desactivar este puesto electivo porque tiene candidatos activos asignados.");
+
             await _repository.SoftDeleteAsync(id);
             await _unitOfWork.CompleteAsync();
 
@@ -97,6 +100,14 @@ namespace eVote360_Pro.Core.Application.Services
 
             var electedOffice = await _repository.GetByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException("No existe un puesto electivo con este id");
+
+            if (await _repository.HasBeenUsedInElectionAsync(dto.Id))
+            {
+                if (electedOffice.Name != dto.Name)
+                {
+                    throw new InvalidOperationException("No se puede modificar el nombre de este puesto electivo porque ya fue utilizado en una elección.");
+                }
+            }
 
             electedOffice.Update(
                 dto.Name,
