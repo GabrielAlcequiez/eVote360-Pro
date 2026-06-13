@@ -1,0 +1,121 @@
+@model eVote360_Pro.WebApp.Models.PoliticalPartyUpdateViewModel
+@{
+    ViewData["Title"] = "Editar Partido Político";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 bg-white">
+                <div class="card-body p-4">
+                    <h1 class="h4 text-dark font-weight-bold mb-4">Editar Partido Político</h1>
+
+                    @if (Model.IsLocked)
+                    {
+                        <div class="alert alert-info border-info d-flex align-items-center mb-4" role="alert">
+                            <div>
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <strong>Campos Bloqueados:</strong> El nombre, las siglas y el logo están bloqueados debido a que este partido ya participó en una elección (activa o finalizada).
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="Logo" />
+
+                        <!-- Si está bloqueado, guardamos los valores originales en inputs ocultos para que se envíen en el post si el controller los requiere (o el model binding) -->
+                        @if (Model.IsLocked)
+                        {
+                            <input type="hidden" asp-for="Name" />
+                            <input type="hidden" asp-for="Acronym" />
+                        }
+
+                        <div class="text-center mb-4">
+                            <label class="form-label d-block font-weight-bold text-secondary mb-2">Logo Actual</label>
+                            @if (!string.IsNullOrEmpty(Model.Logo))
+                            {
+                                <img src="@Model.Logo" alt="Logo de @Model.Name" class="rounded border p-1" style="width: 100px; height: 100px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="rounded border bg-light d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                                    <span class="text-muted">Sin Logo</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label font-weight-bold text-secondary"></label>
+                            @if (Model.IsLocked)
+                            {
+                                <input asp-for="Name" class="form-control" disabled />
+                            }
+                            else
+                            {
+                                <input asp-for="Name" class="form-control" placeholder="Ej. Partido de la Democracia Nacional" />
+                            }
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Acronym" class="form-label font-weight-bold text-secondary"></label>
+                            @if (Model.IsLocked)
+                            {
+                                <input asp-for="Acronym" class="form-control text-uppercase" disabled />
+                            }
+                            else
+                            {
+                                <input asp-for="Acronym" class="form-control text-uppercase" placeholder="Ej. PDN" />
+                            }
+                            <span asp-validation-for="Acronym" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label font-weight-bold text-secondary"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Reseña histórica o principios generales..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LogoFile" class="form-label font-weight-bold text-secondary"></label>
+                            @if (Model.IsLocked)
+                            {
+                                <input asp-for="LogoFile" type="file" class="form-control" disabled />
+                            }
+                            else
+                            {
+                                <input asp-for="LogoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
+                            }
+                            <span asp-validation-for="LogoFile" class="text-danger small"></span>
+                            <div class="form-text text-muted small">Solo suba un archivo si desea reemplazar el logo actual. Formatos válidos: JPG, JPEG o PNG.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="IsActive" class="form-check-label font-weight-bold text-secondary"></label>
+                            </div>
+                            <span asp-validation-for="IsActive" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Volver atrás
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
