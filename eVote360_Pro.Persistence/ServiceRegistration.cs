@@ -26,6 +26,7 @@ namespace eVote360_Pro.Persistence
             services.AddTransient<IElectedOfficeRepository, ElectedOfficeRepository>();
             services.AddTransient<IElectionRepository, ElectionRepository>();
             services.AddTransient<ICitizenRepository, CitizenRepository>();
+            services.AddTransient<IPoliticalPartyRepository, PoliticalPartyRepository>();
             
             // Registra la Unidad de Trabajo minimalista
             services.AddTransient<IUnitOfWork, UnitOfWork>();
