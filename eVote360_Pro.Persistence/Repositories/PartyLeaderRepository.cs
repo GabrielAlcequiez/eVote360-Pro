@@ -1,4 +1,5 @@
 
+using System.Security.Cryptography.X509Certificates;
 using eVote360_Pro.Core.Domain.Common.Enums;
 using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
@@ -34,6 +35,16 @@ namespace eVote360_Pro.Persistence.Repositories
                 .Select(pl => pl.PoliticalPartyId)
                 .ToListAsync();
             return await _context.PoliticalParties.Where(u => u.IsActive == true && !assignedPartyIds.Contains(u.Id)).ToListAsync();
+        }
+
+        public async Task<bool> HasPartyAssignmentAsync(Guid userId)
+        {
+            return await _context.PartyLeaders.AnyAsync(x => x.UserId == userId);
+        }
+
+        public async Task<bool> HasActivePoliticalPartyAsync(Guid userId)
+        {
+            return await _context.PartyLeaders.AnyAsync(x => x.UserId == userId && x.PoliticalParty.IsActive);
         }
     }
 }

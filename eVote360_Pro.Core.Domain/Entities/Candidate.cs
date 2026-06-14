@@ -13,12 +13,13 @@ namespace eVote360_Pro.Core.Domain.Entities
         public PoliticalParty PoliticalParty { get; private set; } = null!;
 
         protected Candidate() { }
-        public Candidate(string name, string lastName, string photo)
+        public Candidate(string name, string lastName, string photo, Guid politicalPartyId)
         {
             Id = Guid.NewGuid();
             Name = name;
             LastName = lastName;
             Photo = photo;
+            PoliticalPartyId = politicalPartyId;
             IsActive = true;
         }
 
