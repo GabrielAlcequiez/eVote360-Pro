@@ -7,8 +7,8 @@
 .env
 
 # User uploaded files
-wwwroot/images/logos/*
-!wwwroot/images/logos/.gitkeep
+**/wwwroot/images/logos/*
+!**/wwwroot/images/logos/.gitkeep
 # User-specific files
 *.rsuser
 *.suo
