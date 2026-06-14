@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-namespace eVote360_Pro.WebApp.Models
+namespace eVote360_Pro.WebApp.Models.PoliticalParty
 {
     public class PoliticalPartyUpdateViewModel
     {

@@ -1,6 +1,6 @@
 using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.Citizen;
-using eVote360_Pro.WebApp.ViewModels.Citizen;
+using eVote360_Pro.WebApp.Models.Citizen;
 
 namespace eVote360_Pro.WebApp.Profiles
 {

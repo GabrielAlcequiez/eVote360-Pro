@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using eVote360_Pro.Core.Application.DTOs.PoliticalParty;
 using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Interfaces;
-using eVote360_Pro.WebApp.Models;
+using eVote360_Pro.WebApp.Models.PoliticalParty;
 
 namespace eVote360_Pro.WebApp.Controllers
 {

@@ -1,6 +1,6 @@
 using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.ElectedOffice;
-using eVote360_Pro.WebApp.ViewModels.ElectedOffice;
+using eVote360_Pro.WebApp.Models.ElectedOffice;
 
 namespace eVote360_Pro.WebApp.Profiles
 {

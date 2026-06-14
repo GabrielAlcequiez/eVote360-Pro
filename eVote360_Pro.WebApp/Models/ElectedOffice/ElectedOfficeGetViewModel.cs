@@ -1,4 +1,4 @@
-namespace eVote360_Pro.WebApp.ViewModels.ElectedOffice
+namespace eVote360_Pro.WebApp.Models.ElectedOffice
 {
     public class ElectedOfficeGetViewModel
     {

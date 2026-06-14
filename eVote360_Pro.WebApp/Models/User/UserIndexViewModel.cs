@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using eVote360_Pro.Core.Application.DTOs.User;
 
-namespace eVote360_Pro.WebApp.Models
+namespace eVote360_Pro.WebApp.Models.User
 {
     public class UserIndexViewModel
     {

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using eVote360_Pro.WebApp.Models;
+using eVote360_Pro.WebApp.Models.Account;
 
 namespace eVote360_Pro.WebApp.Controllers;
 

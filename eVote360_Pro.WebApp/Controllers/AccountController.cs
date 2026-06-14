@@ -3,7 +3,7 @@ using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Common.Enums;
 using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
-using eVote360_Pro.WebApp.Models;
+using eVote360_Pro.WebApp.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
