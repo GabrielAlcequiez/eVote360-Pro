@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace eVote360_Pro.WebApp.Models
+namespace eVote360_Pro.WebApp.Models.Account
 {
     public class LoginViewModel
     {

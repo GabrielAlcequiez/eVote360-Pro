@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using eVote360_Pro.Core.Domain.Common.Enums;
 
-namespace eVote360_Pro.WebApp.Models
+namespace eVote360_Pro.WebApp.Models.User
 {
     public class UserCreateViewModel
     {

@@ -1,4 +1,4 @@
-namespace eVote360_Pro.WebApp.ViewModels.Citizen
+namespace eVote360_Pro.WebApp.Models.Citizen
 {
     public class CitizenGetViewModel
     {

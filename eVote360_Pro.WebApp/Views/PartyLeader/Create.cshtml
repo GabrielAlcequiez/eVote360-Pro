@@ -1,0 +1,49 @@
+@model eVote360_Pro.WebApp.Models.PartyLeader.PartyLeaderCreateViewModel
+@{
+    ViewData["Title"] = "Agregar Asignación de Dirigente";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 bg-white">
+                <div class="card-body p-4">
+                    <h1 class="h4 text-dark font-weight-bold mb-4">Agregar Asignación de Dirigente</h1>
+
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserId" class="form-label font-weight-bold text-secondary"></label>
+                            <select asp-for="UserId" asp-items="Model.AvailableLeaders" class="form-select">
+                                <option value="">-- Seleccionar Dirigente --</option>
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PoliticalPartyId" class="form-label font-weight-bold text-secondary"></label>
+                            <select asp-for="PoliticalPartyId" asp-items="Model.AvailableParties" class="form-select">
+                                <option value="">-- Seleccionar Partido Político --</option>
+                            </select>
+                            <span asp-validation-for="PoliticalPartyId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Volver atrás
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                Crear Asignación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

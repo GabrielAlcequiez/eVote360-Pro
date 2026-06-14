@@ -2,7 +2,7 @@ using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.Citizen;
 using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Interfaces;
-using eVote360_Pro.WebApp.ViewModels.Citizen;
+using eVote360_Pro.WebApp.Models.Citizen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

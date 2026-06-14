@@ -1,0 +1,143 @@
+@model eVote360_Pro.WebApp.Models.PoliticalParty.PoliticalPartyIndexViewModel
+@{
+    ViewData["Title"] = "Mantenimiento de Partidos Políticos";
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-dark font-weight-bold">Partidos Políticos</h1>
+        @if (Model.HasActiveElection)
+        {
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-plus-lg"></i> Crear partido político
+            </button>
+        }
+        else
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Crear partido político
+            </a>
+        }
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.HasActiveElection)
+    {
+        <div class="alert alert-warning border-warning d-flex align-items-center mb-4" role="alert">
+            <div>
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Atención:</strong> No se pueden modificar partidos políticos mientras exista una elección activa.
+            </div>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-0">
+            @if (Model.Parties == null || Model.Parties.Count == 0)
+            {
+                <div class="text-center py-5">
+                    <p class="text-muted mb-0">No hay partidos políticos registrados en el sistema.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4" style="width: 80px;">Logo</th>
+                                <th style="width: 120px;">Siglas</th>
+                                <th>Nombre Completo</th>
+                                <th>Descripción</th>
+                                <th>Dirigente Asignado</th>
+                                <th style="width: 120px;">Estado</th>
+                                <th class="text-end pe-4" style="width: 200px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var party in Model.Parties)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        @if (!string.IsNullOrEmpty(party.Logo))
+                                        {
+                                            <img src="@party.Logo" alt="Logo de @party.Name" class="rounded border" style="width: 45px; height: 45px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded border bg-light d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                                <span class="text-muted small">N/A</span>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="font-weight-bold text-dark">
+                                        <span class="badge bg-secondary text-white px-2 py-1">@party.Acronym</span>
+                                    </td>
+                                    <td class="text-dark">@party.Name</td>
+                                    <td class="text-muted text-truncate" style="max-width: 250px;">
+                                        @(string.IsNullOrEmpty(party.Description) ? "Sin descripción" : party.Description)
+                                    </td>
+                                    <td>
+                                        @(string.IsNullOrEmpty(party.LeaderFullName) ? "No asignado" : party.LeaderFullName)
+                                    </td>
+                                    <td>
+                                        @if (party.IsActive)
+                                        {
+                                            <span class="badge bg-success px-2 py-1">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger px-2 py-1">Inactivo</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        @if (Model.HasActiveElection)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary me-1" disabled>Editar</button>
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                                @(party.IsActive ? "Desactivar" : "Activar")
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@party.Id" class="btn btn-sm btn-outline-primary me-1">
+                                                Editar
+                                            </a>
+                                            @if (party.IsActive)
+                                            {
+                                                <a asp-action="ToggleStatus" asp-route-id="@party.Id" class="btn btn-sm btn-outline-danger">
+                                                    Desactivar
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="ToggleStatus" asp-route-id="@party.Id" class="btn btn-sm btn-outline-success">
+                                                    Activar
+                                                </a>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

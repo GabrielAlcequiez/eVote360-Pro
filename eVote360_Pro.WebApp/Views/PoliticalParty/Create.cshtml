@@ -1,0 +1,58 @@
+@model eVote360_Pro.WebApp.Models.PoliticalParty.PoliticalPartyCreateViewModel
+@{
+    ViewData["Title"] = "Crear Partido Político";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 bg-white">
+                <div class="card-body p-4">
+                    <h1 class="h4 text-dark font-weight-bold mb-4">Registrar Partido Político</h1>
+                    
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label font-weight-bold text-secondary"></label>
+                            <input asp-for="Name" class="form-control" placeholder="Ej. Partido de la Democracia Nacional" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Acronym" class="form-label font-weight-bold text-secondary"></label>
+                            <input asp-for="Acronym" class="form-control text-uppercase" placeholder="Ej. PDN" />
+                            <span asp-validation-for="Acronym" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label font-weight-bold text-secondary"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Reseña histórica o principios generales..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="LogoFile" class="form-label font-weight-bold text-secondary"></label>
+                            <input asp-for="LogoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
+                            <span asp-validation-for="LogoFile" class="text-danger small"></span>
+                            <div class="form-text text-muted small">Formatos válidos: JPG, JPEG o PNG.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Volver atrás
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                Registrar Partido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
