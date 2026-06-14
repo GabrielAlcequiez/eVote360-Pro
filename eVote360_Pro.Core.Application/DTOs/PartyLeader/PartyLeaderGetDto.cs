@@ -6,9 +6,11 @@ namespace eVote360_Pro.Core.Application.DTOs.PartyLeader
         public string UserFullName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
         public string UserUsername { get; set; } = string.Empty;
+        public bool UserIsActive { get; set; }         
 
         public Guid PoliticalPartyId { get; set; }
         public string PoliticalPartyName { get; set; } = string.Empty;
         public string PoliticalPartyAcronym { get; set; } = string.Empty;
+        public bool PoliticalPartyIsActive { get; set; }  
     }
 }
