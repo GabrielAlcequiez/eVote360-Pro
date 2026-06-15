@@ -5,14 +5,22 @@ using System.Threading.Tasks;
 using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.Persistence.Context;
-using Microsoft.EntityFrameworkCore;
-
 using eVote360_Pro.Core.Domain.Common.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace eVote360_Pro.Persistence.Repositories
 {
     public class PoliticalPartyRepository(AppDbContext context) : BaseRepository<PoliticalParty>(context), IPoliticalPartyRepository
     {
+        public async Task<IReadOnlyList<PoliticalParty>> GetAllWithPartyLeadersAsync()
+        {
+            return await _context.PoliticalParties
+                .Include(p => p.PartyLeader)
+                    .ThenInclude(pl => pl.User)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public Task<PoliticalParty?> GetByAcronymAsync(string acronym)
         {
            return _context.PoliticalParties.FirstOrDefaultAsync(p => p.Acronym == acronym);

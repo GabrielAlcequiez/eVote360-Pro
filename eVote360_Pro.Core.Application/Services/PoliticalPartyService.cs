@@ -132,7 +132,7 @@ namespace eVote360_Pro.Core.Application.Services
 
         public async Task<List<PoliticalPartyGetDto>> GetAllAsync()
         {
-            var list = await _partyRepository.GetAllAsync();
+            var list = await _partyRepository.GetAllWithPartyLeadersAsync();
             return _mapper.Map<List<PoliticalPartyGetDto>>(list);
         }
 
