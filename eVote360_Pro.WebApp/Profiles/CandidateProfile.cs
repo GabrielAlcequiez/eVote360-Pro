@@ -9,7 +9,8 @@ namespace eVote360_Pro.WebApp.Profiles
         public CandidateProfile()
         {
             CreateMap<CandidateGetDto, CandidateGetViewModel>();
-            CreateMap<CandidateGetDto, CandidateUpdateViewModel>();
+            CreateMap<CandidateGetDto, CandidateUpdateViewModel>()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore());
             CreateMap<CandidateGetDto, CandidateUpdateDto>();
             CreateMap<CandidateCreateDto, CandidateCreateViewModel>();
             CreateMap<CandidateUpdateDto, CandidateUpdateViewModel>();

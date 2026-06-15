@@ -110,7 +110,6 @@ namespace eVote360_Pro.WebApp.Controllers
                 return NotFound();
 
             var vm = _mapper.Map<CandidateUpdateViewModel>(dto);
-
             return View(vm);
         }
 
