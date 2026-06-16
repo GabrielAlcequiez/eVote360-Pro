@@ -46,5 +46,12 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return await _context.PartyLeaders.AnyAsync(x => x.UserId == userId && x.PoliticalParty.IsActive);
         }
+
+        public async Task<PartyLeader?> GetPartyLeaderDetailsAsync(Guid userId)
+        {
+            return await _context.PartyLeaders
+                .Include(x => x.PoliticalParty)
+                .FirstOrDefaultAsync(x => x.UserId ==userId);
+        }
     }
 }

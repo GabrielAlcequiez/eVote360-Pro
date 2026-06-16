@@ -11,7 +11,7 @@ namespace eVote360_Pro.Core.Application.Validators.CandidateOfficeAssignment
                 .NotEmpty().WithMessage("El candidato es requerido.");
 
             RuleFor(x => x.ElectedOfficeId)
-                .NotEmpty().WithMessage("El cargo electivo es requerido.");
+                .NotEmpty().WithMessage("El puesto electivo es requerido.");
 
             RuleFor(x => x.PoliticalPartyId)
                 .NotEmpty().WithMessage("El partido político postulante es requerido.");

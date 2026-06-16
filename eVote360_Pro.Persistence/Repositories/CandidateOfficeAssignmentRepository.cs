@@ -29,10 +29,38 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             var entity = await _context.CandidateOfficeAssignments
                 .FirstOrDefaultAsync(x => x.Id == id);
-            if(entity is null)
+            if (entity is null)
                 return;
-                
-             _context.CandidateOfficeAssignments.Remove(entity);   
+
+            _context.CandidateOfficeAssignments.Remove(entity);
+        }
+
+        public async Task<CandidateOfficeAssignment?> GetByIdWithDetailsAsync(Guid id)
+        {
+            return await _context.CandidateOfficeAssignments
+                .Include(x => x.Candidate)
+                .Include(x => x.ElectedOffice)
+                .Include(x => x.PoliticalParty)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<IReadOnlyList<CandidateOfficeAssignment>> GetAllWithDetailsAsync()
+        {
+            return await _context.CandidateOfficeAssignments
+                .Include(x => x.Candidate)
+                .Include(x => x.ElectedOffice)
+                .Include(x => x.PoliticalParty)
+                .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<CandidateOfficeAssignment>> GetAllByPartyIdWithDetailsAsync(Guid partyId)
+        {
+            return await _context.CandidateOfficeAssignments
+                .Include(x => x.Candidate)
+                .Include(x => x.ElectedOffice)
+                .Include(x => x.PoliticalParty)
+                .Where(x => x.PoliticalPartyId == partyId)
+                .ToListAsync();
         }
     }
 }
