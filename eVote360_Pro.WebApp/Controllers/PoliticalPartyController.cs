@@ -1,14 +1,13 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using eVote360_Pro.Core.Application.DTOs.PoliticalParty;
 using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Interfaces;
+using eVote360_Pro.WebApp.Helpers;
 using eVote360_Pro.WebApp.Models.PoliticalParty;
 
 namespace eVote360_Pro.WebApp.Controllers
@@ -19,18 +18,15 @@ namespace eVote360_Pro.WebApp.Controllers
         private readonly IPoliticalPartyService _partyService;
         private readonly IElectionRepository _electionRepository;
         private readonly IMapper _mapper;
-        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public PoliticalPartyController(
             IPoliticalPartyService partyService,
             IElectionRepository electionRepository,
-            IMapper mapper,
-            IWebHostEnvironment webHostEnvironment)
+            IMapper mapper)
         {
             _partyService = partyService;
             _electionRepository = electionRepository;
             _mapper = mapper;
-            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -75,30 +71,41 @@ namespace eVote360_Pro.WebApp.Controllers
                 return View(model);
             }
 
-            // Validar que el archivo subido sea una imagen
-            if (model.LogoFile != null && !IsValidImage(model.LogoFile))
-            {
-                ModelState.AddModelError("LogoFile", "El logo del partido debe ser una imagen válida (.jpg, .jpeg, .png).");
-                return View(model);
-            }
-
             try
             {
-                string logoPath = string.Empty;
-                if (model.LogoFile != null)
-                {
-                    logoPath = await UploadLogoAsync(model.LogoFile);
-                }
-
-                var dto = new PoliticalPartyCreateDto
+                // 1. Crear partido con placeholder para obtener el ID
+                var createDto = new PoliticalPartyCreateDto
                 {
                     Name = model.Name,
                     Description = model.Description,
                     Acronym = model.Acronym,
-                    Logo = logoPath
+                    Logo = string.Empty
                 };
 
-                await _partyService.AddAsync(dto);
+                var createdParty = await _partyService.AddAsync(createDto);
+
+                // 2. Subir logo con el ID generado
+                var logoPath = FileManager.Upload(model.LogoFile, createdParty.Id, "Logos");
+
+                if (string.IsNullOrEmpty(logoPath))
+                {
+                    ModelState.AddModelError("LogoFile", "El logo del partido debe ser una imagen válida (.jpg, .jpeg, .png).");
+                    return View(model);
+                }
+
+                // 3. Actualizar el logo en la entidad
+                var updateDto = new PoliticalPartyUpdateDto
+                {
+                    Id = createdParty.Id,
+                    Name = createdParty.Name,
+                    Description = createdParty.Description,
+                    Acronym = createdParty.Acronym,
+                    Logo = logoPath,
+                    IsActive = createdParty.IsActive
+                };
+
+                await _partyService.UpdateAsync(updateDto);
+
                 TempData["SuccessMessage"] = "Partido político creado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -177,28 +184,22 @@ namespace eVote360_Pro.WebApp.Controllers
                 return View(model);
             }
 
-            // Validar que el archivo subido sea una imagen si se provee
-            if (model.LogoFile != null)
+            // Si está bloqueado y se intenta subir un logo, rechazar
+            if (isLocked && model.LogoFile != null)
             {
-                if (isLocked)
-                {
-                    ModelState.AddModelError(string.Empty, "No se puede modificar el logo de este partido político porque ya participó en una elección.");
-                    return View(model);
-                }
-
-                if (!IsValidImage(model.LogoFile))
-                {
-                    ModelState.AddModelError("LogoFile", "El logo del partido debe ser una imagen válida (.jpg, .jpeg, .png).");
-                    return View(model);
-                }
+                ModelState.AddModelError(string.Empty, "No se puede modificar el logo de este partido político porque ya participó en una elección.");
+                return View(model);
             }
 
             try
             {
-                string? logoPath = null;
-                if (model.LogoFile != null && !isLocked)
+                var logoPath = FileManager.Upload(model.LogoFile, model.Id, "Logos",
+                    isEditMode: true, imagePath: model.Logo);
+
+                if (model.LogoFile != null && string.IsNullOrEmpty(logoPath))
                 {
-                    logoPath = await UploadLogoAsync(model.LogoFile);
+                    ModelState.AddModelError("LogoFile", "El logo del partido debe ser una imagen válida (.jpg, .jpeg, .png).");
+                    return View(model);
                 }
 
                 var dto = new PoliticalPartyUpdateDto
@@ -207,7 +208,7 @@ namespace eVote360_Pro.WebApp.Controllers
                     Name = model.Name,
                     Description = model.Description,
                     Acronym = model.Acronym,
-                    Logo = logoPath ?? model.Logo, // Si no se sube logo nuevo, se mantiene el actual
+                    Logo = logoPath!, // FileManager retorna el path existente si no hay archivo nuevo
                     IsActive = model.IsActive
                 };
 
@@ -282,31 +283,5 @@ namespace eVote360_Pro.WebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        #region Helper Methods
-        private static bool IsValidImage(IFormFile file)
-        {
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            return extension == ".jpg" || extension == ".jpeg" || extension == ".png";
-        }
-
-        private async Task<string> UploadLogoAsync(IFormFile file)
-        {
-            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logos");
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-
-            var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-            var filePath = Path.Combine(folderPath, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            return $"/images/logos/{uniqueFileName}";
-        }
-        #endregion
     }
 }

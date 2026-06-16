@@ -18,8 +18,9 @@ namespace eVote360_Pro.Core.Application.Validators.PoliticalParty
                 .NotEmpty().WithMessage("El acrónimo es requerido.")
                 .MaximumLength(10).WithMessage("El acrónimo no puede superar los 10 caracteres.");
 
-            RuleFor(x => x.Logo)
-                .NotEmpty().WithMessage("El logo del partido es requerido.");
+            // desactivada porque ya de esto se encarga vm
+            // RuleFor(x => x.Logo)
+            //     .NotEmpty().WithMessage("El logo del partido es requerido.");
         }
     }
 }

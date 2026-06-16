@@ -14,9 +14,6 @@ namespace eVote360_Pro.Core.Application.Validators.Candidate
             RuleFor(x => x.LastName)
                 .NotEmpty().WithMessage("El apellido del candidato es requerido.")
                 .MaximumLength(100).WithMessage("El apellido no puede superar los 100 caracteres.");
-
-            RuleFor(x => x.Photo)
-                .NotEmpty().WithMessage("La foto del candidato es requerida.");
         }
     }
 }
