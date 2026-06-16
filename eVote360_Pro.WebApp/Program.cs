@@ -68,7 +68,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        await eVote360_Pro.Persistence.DatabaseSeeder.SeedDatabaseAsync(services);
+        await DatabaseSeeder.SeedDatabaseAsync(services);
     }
     catch (Exception ex)
     {

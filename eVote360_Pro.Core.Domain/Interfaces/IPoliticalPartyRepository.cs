@@ -12,5 +12,6 @@ namespace eVote360_Pro.Core.Domain.Interfaces
         Task<bool> HasActiveCandidatesAsync(Guid id);
         Task<bool> HasActiveLeaderAsync(Guid id);
         Task<bool> HasParticipatedInElectionAsync(Guid id);
+        Task<IReadOnlyList<PoliticalParty>> GetAllWithPartyLeadersAsync();
     }
 }

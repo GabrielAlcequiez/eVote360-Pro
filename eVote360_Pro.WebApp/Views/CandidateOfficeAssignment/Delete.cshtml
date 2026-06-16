@@ -1,0 +1,69 @@
+@model CandidateOfficeAssignmentGetViewModel
+@{
+    ViewData["Title"] = "Eliminar Asignación";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm p-4 p-md-5 text-center" style="border-radius: 20px; background: #ffffff;">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 3.5rem;"></i>
+                </div>
+                <h2 class="h4 font-weight-bold mb-3" style="color: #0f172a;">¿Está seguro que desea desvincular este candidato de este puesto electivo?</h2>
+                <p class="text-muted mb-4" style="font-size: 0.95rem;">
+                    Esta acción eliminará la relación entre <strong>@Model.CandidateFullName</strong> y el puesto <strong>@Model.ElectedOfficeName</strong> dentro de tu partido político.
+                </p>
+
+                <div class="d-flex align-items-center justify-content-center gap-3 p-3 rounded-3 mb-4" style="background-color: #f8fafc;">
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.CandidatePhoto))
+                        {
+                            <img src="@Model.CandidatePhoto" alt="@Model.CandidateFullName"
+                                 class="rounded-circle border shadow-sm"
+                                 style="width: 60px; height: 60px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border mx-auto"
+                                 style="width: 60px; height: 60px;">
+                                <i class="bi bi-person-fill text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="text-start">
+                        <div class="font-weight-bold" style="color: #0f172a; font-size: 1.05rem;">@Model.CandidateFullName</div>
+                        <div class="text-muted small" style="font-size: 0.85rem;">
+                            @Model.ElectedOfficeName
+                            <span class="ms-1 badge bg-secondary">@Model.CandidateOriginPartyAcronym</span>
+                        </div>
+                        <div class="text-muted small" style="font-size: 0.85rem;">
+                            @if (Model.TypeName == "Standard")
+                            {
+                                <span>Propio</span>
+                            }
+                            else
+                            {
+                                <span>Aliado</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4" style="border-radius: 10px;">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4 py-2" style="border-radius: 10px;">
+                            Aceptar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
