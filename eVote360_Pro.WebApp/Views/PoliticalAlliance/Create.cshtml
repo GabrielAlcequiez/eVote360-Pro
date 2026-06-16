@@ -1,0 +1,37 @@
+@model eVote360_Pro.WebApp.Models.PoliticalAlliance.PoliticalAllianceCreateViewModel
+@{
+    ViewData["Title"] = "Crear Solicitud de Alianza";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 bg-white">
+                <div class="card-body p-4">
+                    <h1 class="h4 text-dark font-weight-bold mb-4">Crear Solicitud de Alianza</h1>
+
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="ReceiverPartyId" class="form-label fw-semibold text-secondary"></label>
+                            <select asp-for="ReceiverPartyId" asp-items="Model.AvailableParties" class="form-select">
+                                <option value="">-- Seleccionar Partido Político --</option>
+                            </select>
+                            <span asp-validation-for="ReceiverPartyId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Volver atrás</a>
+                            <button type="submit" class="btn btn-primary px-4">Crear solicitud</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
