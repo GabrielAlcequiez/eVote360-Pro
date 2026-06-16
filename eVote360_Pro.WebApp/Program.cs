@@ -4,6 +4,7 @@ using eVote360_Pro.Core.Application;
 using eVote360_Pro.Core.Application.Profiles;
 using eVote360_Pro.WebApp.Profiles;
 using eVote360_Pro.Persistence;
+using eVote360_Pro.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +15,10 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddMaps(typeof(UserProfile).Assembly, typeof(WebMappingProfile).Assembly);
 });
 
-// Registrar las capas de Aplicación y Persistencia
+// Registrar las capas de Aplicación, Persistencia e Infraestructura
 builder.Services.AddApplicationLayer();
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructureLayer(builder.Configuration);
 
 // Registrar validadores de FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateValidator>();
@@ -36,6 +38,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(2); // Duración de la sesión
     });
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10); // Expira rápido por seguridad
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -50,6 +60,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseSession();
 
 // Habilitar Autenticación y Autorización en el orden correcto
 app.UseAuthentication();

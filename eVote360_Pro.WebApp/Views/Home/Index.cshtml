@@ -1,4 +1,4 @@
-﻿@using System.Security.Claims
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Panel de Control";
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -96,7 +96,7 @@
                             <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
                                 Gestiona las alianzas políticas con otros partidos o revisa solicitudes recibidas.
                             </p>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-success w-100 mt-3">Ir a Alianzas</a>
+                            <a asp-controller="PoliticalAlliance" asp-action="Index" class="btn btn-outline-success w-100 mt-3">Ir a Alianzas</a>
                         </div>
                     </div>
                 </div>
@@ -126,8 +126,8 @@
                     Plataforma Oficial de Gestión Electoral y Votación Electrónica.
                 </p>
                 <div class="d-flex justify-content-center gap-3">
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg px-4" style="border-radius: 8px;">Portal de Votación</a>
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-lg px-4" style="border-radius: 8px;">Acceso Personal</a>
+                    <a asp-controller="Voter" asp-action="Index" class="btn btn-primary btn-lg px-4" style="border-radius: 8px;">Votar Aquí (Ciudadanos)</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-lg px-4" style="border-radius: 8px;">Acceso JCE / Dirigentes Políticos</a>
                 </div>
             </div>
         </div>

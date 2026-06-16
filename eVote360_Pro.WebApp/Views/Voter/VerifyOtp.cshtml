@@ -1,0 +1,190 @@
+@model eVote360_Pro.WebApp.Models.Voter.VoterOtpViewModel
+@{
+    ViewData["Title"] = "Verificación OTP";
+}
+
+<style>
+    /* Estilo limpio para los dígitos del OTP */
+    .otp-inputs-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin: 25px 0;
+    }
+    .otp-field {
+        width: 45px;
+        height: 55px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background-color: #fff;
+        transition: all 0.15s ease-in-out;
+    }
+    .otp-field:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .timer-badge {
+        font-weight: 600;
+        color: #dc3545;
+    }
+    .resend-box {
+        display: none;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success text-center mb-4">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="card shadow-sm border-secondary-subtle">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h2 class="h3 font-weight-bold text-dark">Portal de Votación</h2>
+                    <p class="text-muted">Paso 3: Código de Autenticación OTP</p>
+                </div>
+
+                <!-- Pasos de Progreso -->
+                <div class="d-flex justify-content-around align-items-center mb-4">
+                    <span class="badge bg-success px-3 py-2">✓ Cédula</span>
+                    <span class="text-muted">→</span>
+                    <span class="badge bg-success px-3 py-2">✓ Foto OCR</span>
+                    <span class="text-muted">→</span>
+                    <span class="badge bg-primary px-3 py-2">3. Código OTP</span>
+                </div>
+
+                <div class="alert alert-success text-center py-2 mb-4">
+                    Hemos enviado un código a:<br/>
+                    <strong>@ViewBag.MaskedEmail</strong>
+                </div>
+
+                <form asp-action="VerifyOtp" asp-controller="Voter" method="post" id="otpForm">
+                    @Html.AntiForgeryToken()
+                    
+                    <input type="hidden" asp-for="OtpCode" id="hiddenOtpInput" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small text-center"></div>
+
+                    <div class="mb-4">
+                        <label class="form-label d-block text-center font-weight-bold">Introduce el código de 6 dígitos</label>
+                        
+                        <div class="otp-inputs-wrapper">
+                            <input type="text" maxlength="1" class="otp-field" pattern="\d" inputmode="numeric" required />
+                            <input type="text" maxlength="1" class="otp-field" pattern="\d" inputmode="numeric" required />
+                            <input type="text" maxlength="1" class="otp-field" pattern="\d" inputmode="numeric" required />
+                            <input type="text" maxlength="1" class="otp-field" pattern="\d" inputmode="numeric" required />
+                            <input type="text" maxlength="1" class="otp-field" pattern="\d" inputmode="numeric" required />
+                            <input type="text" maxlength="1" class="otp-field" pattern="\d" inputmode="numeric" required />
+                        </div>
+                        <span asp-validation-for="OtpCode" class="text-danger small mt-1 d-block text-center"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 py-2" id="btnSubmit">Verificar y Entrar</button>
+                    <a asp-action="UploadOcr" asp-controller="Voter" class="btn btn-outline-secondary w-100 mt-2">← Volver Atrás</a>
+                </form>
+
+                <!-- Cronómetro -->
+                <div class="text-center mt-3 text-muted" id="timerContainer">
+                    <span>El código expira en: </span>
+                    <span class="timer-badge" id="countdown">05:00</span>
+                </div>
+
+                <!-- Reenvío -->
+                <div class="resend-box text-center" id="resendContainer">
+                    <p class="text-danger small mb-2">El código de verificación ha expirado.</p>
+                    <a asp-action="SendOtp" asp-controller="Voter" class="btn btn-outline-primary btn-sm">
+                        Reenviar código por correo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // OTP Inputs logic
+        const digits = document.querySelectorAll('.otp-field');
+        const hiddenOtp = document.getElementById('hiddenOtpInput');
+        const otpForm = document.getElementById('otpForm');
+
+        digits.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key >= 0 && e.key <= 9) {
+                    if (index < digits.length - 1) {
+                        digits[index + 1].focus();
+                    }
+                } else if (e.key === 'Backspace') {
+                    if (index > 0) {
+                        digits[index - 1].focus();
+                    }
+                }
+                updateHiddenValue();
+            });
+
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').trim();
+                if (pasteData.length === 6 && /^\d+$/.test(pasteData)) {
+                    digits.forEach((digitInput, idx) => {
+                        digitInput.value = pasteData[idx];
+                    });
+                    updateHiddenValue();
+                    digits[5].focus();
+                }
+            });
+        });
+
+        function updateHiddenValue() {
+            let code = '';
+            digits.forEach(input => {
+                code += input.value;
+            });
+            hiddenOtp.value = code;
+        }
+
+        // Countdown timer (5 minutes)
+        const duration = 5 * 60;
+        let timer = duration, minutes, seconds;
+        const display = document.getElementById('countdown');
+        const timerContainer = document.getElementById('timerContainer');
+        const resendContainer = document.getElementById('resendContainer');
+        const btnSubmit = document.getElementById('btnSubmit');
+
+        const countdownInterval = setInterval(() => {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(countdownInterval);
+                timerContainer.style.display = 'none';
+                resendContainer.style.display = 'block';
+                btnSubmit.disabled = true;
+                digits.forEach(input => input.disabled = true);
+            }
+        }, 1000);
+
+        otpForm.addEventListener('submit', (e) => {
+            updateHiddenValue();
+            if (hiddenOtp.value.length !== 6) {
+                e.preventDefault();
+                alert('Debe ingresar los 6 dígitos del código.');
+            }
+        });
+    </script>
+}
