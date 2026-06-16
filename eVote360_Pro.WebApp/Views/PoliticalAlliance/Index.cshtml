@@ -1,0 +1,220 @@
+@model eVote360_Pro.WebApp.Models.PoliticalAlliance.PoliticalAllianceIndexViewModel
+@using eVote360_Pro.Core.Domain.Common.Enums
+@{
+    ViewData["Title"] = "Alianzas Políticas";
+}
+
+<div class="container my-4">
+    <h1 class="h3 mb-4 text-dark font-weight-bold">Alianzas Políticas</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.HasActiveElection)
+    {
+        <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Atención:</strong>&nbsp; No se pueden modificar alianzas políticas mientras exista una elección activa.
+        </div>
+    }
+
+    @* ========== SECCIÓN 1: SOLICITUDES PENDIENTES DE RESPONDER ========== *@
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 text-dark">Solicitudes pendientes de responder</h5>
+            <span class="badge bg-warning text-dark">@Model.PendingRequest.Count</span>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.PendingRequest.Any())
+            {
+                <p class="text-muted text-center py-4 mb-0">No hay solicitudes pendientes de responder.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Partido Solicitante</th>
+                                <th>Siglas</th>
+                                <th>Fecha de Solicitud</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var req in Model.PendingRequest)
+                            {
+                                <tr>
+                                    <td class="ps-4">@req.RequesterPartyName</td>
+                                    <td><span class="badge bg-secondary">@req.RequesterPartyAcronym</span></td>
+                                    <td>@req.RequestDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="text-end pe-4">
+                                        @if (Model.HasActiveElection)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary me-1" disabled>Aceptar</button>
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>Rechazar</button>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="Accept" asp-route-id="@req.Id" class="btn btn-sm btn-outline-success me-1">Aceptar</a>
+                                            <a asp-action="Reject" asp-route-id="@req.Id" class="btn btn-sm btn-outline-danger">Rechazar</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* ========== SECCIÓN 2: SOLICITUDES REALIZADAS ========== *@
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 text-dark">Solicitudes realizadas</h5>
+            @if (!Model.HasActiveElection)
+            {
+                <a asp-action="Create" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i> Nueva solicitud
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="bi bi-plus-lg"></i> Nueva solicitud
+                </button>
+            }
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.SentRequests.Any())
+            {
+                <p class="text-muted text-center py-4 mb-0">No hay solicitudes enviadas.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Partido Destino</th>
+                                <th>Siglas</th>
+                                <th>Fecha de Solicitud</th>
+                                <th>Estado</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var req in Model.SentRequests)
+                            {
+                                <tr>
+                                    <td class="ps-4">@req.ReceiverPartyName</td>
+                                    <td><span class="badge bg-secondary">@req.ReceiverPartyAcronym</span></td>
+                                    <td>@req.RequestDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @switch (req.Status)
+                                        {
+                                            case AllianceStatus.Pending:
+                                                <span class="badge bg-warning text-dark">En espera</span>
+                                                break;
+                                            case AllianceStatus.Accepted:
+                                                <span class="badge bg-success">Aceptada</span>
+                                                break;
+                                            case AllianceStatus.Rejected:
+                                                <span class="badge bg-danger">Rechazada</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        @if (req.Status != AllianceStatus.Accepted)
+                                        {
+                                            @if (Model.HasActiveElection)
+                                            {
+                                                <button class="btn btn-sm btn-outline-secondary" disabled>Eliminar</button>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="DeleteRequest" asp-route-id="@req.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* ========== SECCIÓN 3: ALIANZAS VIGENTES ========== *@
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 text-dark">Alianzas vigentes</h5>
+            <span class="badge bg-success">@Model.ActiveAlliance.Count</span>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.ActiveAlliance.Any())
+            {
+                <p class="text-muted text-center py-4 mb-0">No hay alianzas vigentes.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Partido Solicitante</th>
+                                <th>Siglas Solicitante</th>
+                                <th>Partido Receptor</th>
+                                <th>Siglas Receptor</th>
+                                <th>Fecha de Aceptación</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var alliance in Model.ActiveAlliance)
+                            {
+                                <tr>
+                                    <td class="ps-4">@alliance.RequesterPartyName</td>
+                                    <td><span class="badge bg-success">@alliance.RequesterPartyAcronym</span></td>
+                                    <td>@alliance.ReceiverPartyName</td>
+                                    <td><span class="badge bg-success">@alliance.ReceiverPartyAcronym</span></td>
+                                    <td>
+                                        @if (alliance.AcceptanceDate.HasValue)
+                                        {
+                                            @alliance.AcceptanceDate.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        @if (Model.HasActiveElection)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>Eliminar alianza</button>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="DeleteAlliance" asp-route-id="@alliance.Id" class="btn btn-sm btn-outline-danger">Eliminar alianza</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

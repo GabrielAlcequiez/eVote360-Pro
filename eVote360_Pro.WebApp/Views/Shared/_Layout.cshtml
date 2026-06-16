@@ -40,10 +40,10 @@
                                     <a class="nav-link text-light" asp-area="" asp-controller="Citizen" asp-action="Index">Ciudadanos</a>
                                 </li>
                             }
-                            else if (User.IsInRole("PoliticalLeader"))
+                            else if (User.IsInRole(role: "PoliticalLeader"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Alianzas</a>
+                                    <a class="nav-link text-light" asp-area="" asp-controller="PoliticalAlliance" asp-action="Index">Alianzas</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Candidatos</a>

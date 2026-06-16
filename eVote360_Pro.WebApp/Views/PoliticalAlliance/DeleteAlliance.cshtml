@@ -1,0 +1,37 @@
+@model eVote360_Pro.Core.Application.DTOs.PoliticalAlliance.PoliticalAllianceGetDto
+@{
+    ViewData["Title"] = "Eliminar Alianza Política";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-danger border bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-3 me-3"></i>
+                        <h1 class="h4 mb-0 text-dark">Confirmar Eliminación de Alianza</h1>
+                    </div>
+                    <p class="text-muted mb-3">
+                        ¿Está seguro de que desea <strong>romper</strong> la alianza política con el partido
+                        <strong>@Model.RequesterPartyName (@Model.RequesterPartyAcronym)</strong>?
+                    </p>
+                    <div class="alert alert-danger small mb-4">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Esta operación <strong>no se puede realizar</strong> si existen candidatos aliados asignados entre ambos partidos.
+                        Debe eliminar las asignaciones correspondientes primero desde el módulo <em>Asignar candidato a puesto</em>.
+                    </div>
+
+                    <form asp-action="DeleteAlliance" asp-route-id="@Model.Id" method="post">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash me-1"></i> Sí, eliminar alianza
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
