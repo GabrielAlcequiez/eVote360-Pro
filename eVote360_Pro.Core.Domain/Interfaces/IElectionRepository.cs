@@ -5,5 +5,6 @@ namespace eVote360_Pro.Core.Domain.Interfaces
     public interface IElectionRepository : IBaseRepository<Election>
     {
         Task<bool> ValidateNoActiveElectionAsync();
+        Task<Election?> GetActiveElectionAsync();
     }
 }
