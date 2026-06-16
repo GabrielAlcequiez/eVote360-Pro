@@ -12,5 +12,10 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return await _context.Elections.AnyAsync(e => e.Status == ElectionStatus.Active);
         }
+
+        public async Task<Election?> GetActiveElectionAsync()
+        {
+            return await _context.Elections.FirstOrDefaultAsync(e => e.Status == ElectionStatus.Active);
+        }
     }
 }
