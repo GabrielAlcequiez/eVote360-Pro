@@ -23,6 +23,16 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return await _context.CandidateOfficeAssignments
                 .FirstOrDefaultAsync(x => x.CandidateId == candidateId && x.PoliticalPartyId == partyId);
-        }        
+        }
+
+        public async Task DeletePhysicallyAsync(Guid id)
+        {
+            var entity = await _context.CandidateOfficeAssignments
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if(entity is null)
+                return;
+                
+             _context.CandidateOfficeAssignments.Remove(entity);   
+        }
     }
 }
