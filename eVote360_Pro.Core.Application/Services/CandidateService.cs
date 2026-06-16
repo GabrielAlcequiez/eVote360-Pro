@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.Candidate;
 using eVote360_Pro.Core.Application.Interfaces;
@@ -91,9 +92,13 @@ namespace eVote360_Pro.Core.Application.Services
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<IReadOnlyList<CandidateGetDto>> GetAllAsync()
+        public async Task<IReadOnlyList<CandidateGetDto>> GetAllAsync(Guid userId)
         {
-            var candidates = await _repository.GetAllAsync();
+            var partyLeader = await _partyLeaderRepository.GetByIdAsync(userId);
+            if(partyLeader == null)
+                throw new KeyNotFoundException("No se pudo encontrar el dirigente");
+            
+            var candidates = await _repository.GetAllWithParty(partyLeader.PoliticalPartyId);
             return _mapper.Map<List<CandidateGetDto>>(candidates);
         }
 
