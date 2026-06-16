@@ -79,7 +79,7 @@ Antes de dividirse, ambos integrantes configuran las bases del proyecto para evi
 ## Fase 4: Core del Sistema
 > **Modalidad: Full-Stack por módulo**
 
-> ⚠️ **Advertencia de carga:** La tarea de Persona B en esta fase (OCR + OTP + correo + boleta inmutable) es significativamente más compleja que la de Persona A. Se recomienda revisar el balance y considerar mover alguna sub-tarea antes de iniciar.
+> **Ajuste de balance:** La boleta electoral y la persistencia del voto se asignan a Persona A porque dependen directamente del motor de elecciones, la disponibilidad de puestos/candidatos y el cálculo posterior de resultados. Persona B se enfoca en el flujo de seguridad previo al voto: validación del ciudadano, OCR, OTP y correo.
 
 ---
 
@@ -89,8 +89,19 @@ Antes de dividirse, ambos integrantes configuran las bases del proyecto para evi
 - Gestión de estados: `Pendiente` → `Activa` → `Finalizada`.
 - Restricción global: una vez que la elección pasa a `Activa`, se bloquea la edición de candidatos, partidos y puestos.
 
+#### Boleta y Registro de Votos
+- Pantalla de puestos electivos disponibles para la elección activa.
+- Pantalla de selección de candidato por puesto.
+- Inclusión de la opción `Ninguno` como selección válida.
+- Validación de que el ciudadano haya completado OCR y OTP antes de votar.
+- Persistencia del voto como registro **inmutable**.
+- Validación de una sola selección por ciudadano, elección y puesto.
+- Finalización del proceso de votación cuando todos los puestos tengan selección.
+- Envío del resumen de votación usando el servicio de correo provisto por Persona B.
+
 #### Pantalla de Resultados
 - Cálculo de porcentajes por candidato.
+- Conteo de votos para la opción `Ninguno`.
 - Ordenamiento de resultados de mayor a menor.
 - Detección y manejo de empates.
 - Determinación de ganadores por puesto.
@@ -102,15 +113,33 @@ Antes de dividirse, ambos integrantes configuran las bases del proyecto para evi
 #### Validación de Identidad
 - Validación inicial del documento de identidad del ciudadano.
 - Integración del motor OCR **Tesseract** para leer y verificar la foto de la cédula.
+- Marcado temporal de identidad validada para que la boleta pueda autorizar el acceso.
 
 #### Autenticación por Código OTP
 - Generación de código de 6 dígitos (capa `Shared`).
 - Envío del código por correo electrónico.
 - Validación con expiración de **5 minutos**.
+- Marcado temporal de OTP validado para que la boleta pueda autorizar el acceso.
 
-#### Boleta y Voto
-- Diseño de la boleta interactiva.
-- Persistencia del voto como registro **inmutable**.
+#### Servicio de Correo y Seguridad del Flujo
+- Configuración de servicio de correo reutilizable.
+- Correo de código de verificación.
+- Plantilla base para correo de resumen de votación.
+- Validación de acceso para impedir votar sin OCR y OTP.
+
+---
+
+## Contrato de Integración Fase 4
+
+| Punto de integración | Responsable principal | Consume |
+|---|---|---|
+| Elección activa y estados | Persona A | Persona B |
+| Validación de ciudadano/documento | Persona B | Persona A |
+| OCR validado | Persona B | Persona A |
+| OTP validado | Persona B | Persona A |
+| Servicio de correo | Persona B | Persona A |
+| Boleta, votos y finalización | Persona A | Persona B |
+| Resultados electorales | Persona A | |
 
 ---
 
@@ -129,4 +158,5 @@ Antes de dividirse, ambos integrantes configuran las bases del proyecto para evi
 | Motor de Elecciones | ✅ | |
 | Resultados | ✅ | |
 | Validación OCR / OTP | | ✅ |
-| Boleta y Voto | | ✅ |
+| Servicio de Correo | | ✅ |
+| Boleta y Voto | ✅ | |
