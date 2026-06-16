@@ -25,7 +25,8 @@ namespace eVote360_Pro.WebApp.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var dtos = await _service.GetAllAsync();
+            Guid userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var dtos = await _service.GetAllAsync(userId);
             var vms = _mapper.Map<List<CandidateGetViewModel>>(dtos);
             ViewBag.HasActiveElection = await IsElectionActiveAsync();
             return View(vms);

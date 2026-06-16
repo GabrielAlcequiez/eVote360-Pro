@@ -1,6 +1,8 @@
 using System.Runtime.CompilerServices;
 using AutoMapper;
+using eVote360_Pro.Core.Application.DTOs.Candidate;
 using eVote360_Pro.Core.Application.DTOs.CandidateOfficeAssignment;
+using eVote360_Pro.Core.Application.DTOs.ElectedOffice;
 using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
@@ -173,6 +175,81 @@ namespace eVote360_Pro.Core.Application.Services
                     "No tiene permisos para ver esta asignación.");
 
             return _mapper.Map<CandidateOfficeAssignmentGetDto>(assignment);
+        }
+
+        public async Task<List<CandidateGetDto>> GetAvailableCandidatesAsync(Guid partyId)
+        {
+            var allCandidates = await _candidateRepository.GetAllAsync();
+            var allParties = await _politicalPartyRepository.GetAllAsync();
+            var partyDict = allParties.ToDictionary(p => p.Id);
+            var allAssignments = await _repository.GetAllWithDetailsAsync();
+
+            var ownPartyAssignedCandidateIds = allAssignments
+                .Where(a => a.PoliticalPartyId == partyId)
+                .Select(a => a.CandidateId)
+                .ToHashSet();
+
+            var alliedPartyIds = new List<Guid>();
+            foreach (var party in allParties.Where(p => p.IsActive && p.Id != partyId))
+            {
+                if (await _politicalAllianceRepository.HasActiveAllianceBetweenPartiesAsync(partyId, party.Id))
+                    alliedPartyIds.Add(party.Id);
+            }
+
+            var alliedCandidateIds = new HashSet<Guid>();
+            if (alliedPartyIds.Count != 0)
+            {
+                var alliedAssignments = allAssignments
+                    .Where(a => alliedPartyIds.Contains(a.PoliticalPartyId))
+                    .GroupBy(a => a.CandidateId)
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                foreach (var candidate in allCandidates.Where(c => c.IsActive && alliedPartyIds.Contains(c.PoliticalPartyId)))
+                {
+                    if (!ownPartyAssignedCandidateIds.Contains(candidate.Id) && alliedAssignments.ContainsKey(candidate.Id))
+                        alliedCandidateIds.Add(candidate.Id);
+                }
+            }
+
+            var result = new List<CandidateGetDto>();
+
+            foreach (var candidate in allCandidates.Where(c => c.IsActive))
+            {
+                bool isOwn = candidate.PoliticalPartyId == partyId && !ownPartyAssignedCandidateIds.Contains(candidate.Id);
+                bool isAllied = alliedCandidateIds.Contains(candidate.Id);
+
+                if (!isOwn && !isAllied)
+                    continue;
+
+                var party = partyDict.GetValueOrDefault(candidate.PoliticalPartyId);
+                result.Add(new CandidateGetDto
+                {
+                    Id = candidate.Id,
+                    Name = candidate.Name,
+                    LastName = candidate.LastName,
+                    Photo = candidate.Photo,
+                    IsActive = candidate.IsActive,
+                    PoliticalPartyId = candidate.PoliticalPartyId,
+                    PoliticalPartyName = party?.Name ?? string.Empty,
+                    PoliticalPartyAcronym = party?.Acronym ?? string.Empty,
+                    PoliticalPartyLogo = party?.Logo ?? string.Empty
+                });
+            }
+
+            return result;
+        }
+
+        public async Task<List<ElectedOfficeGetDto>> GetAvailableOfficesAsync(Guid partyId)
+        {
+            var allOffices = await _electedOfficeRepository.GetAllAsync();
+            var assignments = await _repository.GetAllByPartyIdWithDetailsAsync(partyId);
+            var assignedOfficeIds = assignments.Select(a => a.ElectedOfficeId).ToHashSet();
+
+            var available = allOffices
+                .Where(o => o.IsActive && !assignedOfficeIds.Contains(o.Id))
+                .ToList();
+
+            return _mapper.Map<List<ElectedOfficeGetDto>>(available);
         }
     }
 }

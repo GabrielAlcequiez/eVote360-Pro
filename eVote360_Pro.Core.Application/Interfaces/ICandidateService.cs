@@ -8,6 +8,6 @@ namespace eVote360_Pro.Core.Application.Interfaces
         Task UpdateAsync(CandidateUpdateDto dto, Guid userId);
         Task DeleteAsync(Guid id, Guid userId);
         Task<CandidateGetDto?> GetByIdAsync(Guid id);
-        Task<IReadOnlyList<CandidateGetDto>> GetAllAsync();
+        Task<IReadOnlyList<CandidateGetDto>> GetAllAsync(Guid userId);
     }
 }

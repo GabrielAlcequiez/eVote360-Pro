@@ -1,0 +1,58 @@
+@model CandidateOfficeAssignmentCreateViewModel
+@{
+    ViewData["Title"] = "Agregar Asignación";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+                <a asp-action="Index" class="text-decoration-none text-muted" style="font-size: 0.9rem;">
+                    ← Volver al listado
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 20px; background: #ffffff;">
+                <div class="mb-4">
+                    <h2 class="h3 font-weight-bold mb-1" style="color: #0f172a; font-weight: 700;">@ViewData["Title"]</h2>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Selecciona un candidato y el puesto electivo al que deseas asignarlo.</p>
+                </div>
+
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 p-3 mb-4" style="border-radius: 12px; background-color: rgba(239, 68, 68, 0.1); color: #991b1b; font-size: 0.9rem;"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="CandidateId" class="form-label" style="font-size: 0.85rem; font-weight: 500; color: #475569;">Candidato político</label>
+                        <select asp-for="CandidateId" asp-items="Model.AvailableCandidates" class="form-select" style="border-radius: 10px; padding: 10px 14px;">
+                            <option value="">-- Seleccionar Candidato --</option>
+                        </select>
+                        <span asp-validation-for="CandidateId" class="text-danger" style="font-size: 0.8rem;"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ElectedOfficeId" class="form-label" style="font-size: 0.85rem; font-weight: 500; color: #475569;">Puesto electivo</label>
+                        <select asp-for="ElectedOfficeId" asp-items="Model.AvailableOffices" class="form-select" style="border-radius: 10px; padding: 10px 14px;">
+                            <option value="">-- Seleccionar Puesto Electivo --</option>
+                        </select>
+                        <span asp-validation-for="ElectedOfficeId" class="text-danger" style="font-size: 0.8rem;"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4" style="border-radius: 10px;">
+                            Volver atrás
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 10px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); border: none;">
+                            Crear asignación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
