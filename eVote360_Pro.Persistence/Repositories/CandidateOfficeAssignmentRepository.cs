@@ -39,6 +39,7 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return await _context.CandidateOfficeAssignments
                 .Include(x => x.Candidate)
+                    .ThenInclude(x => x.PoliticalParty)
                 .Include(x => x.ElectedOffice)
                 .Include(x => x.PoliticalParty)
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -48,6 +49,7 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return await _context.CandidateOfficeAssignments
                 .Include(x => x.Candidate)
+                    .ThenInclude(x => x.PoliticalParty)
                 .Include(x => x.ElectedOffice)
                 .Include(x => x.PoliticalParty)
                 .ToListAsync();
@@ -57,6 +59,7 @@ namespace eVote360_Pro.Persistence.Repositories
         {
             return await _context.CandidateOfficeAssignments
                 .Include(x => x.Candidate)
+                    .ThenInclude(x => x.PoliticalParty)
                 .Include(x => x.ElectedOffice)
                 .Include(x => x.PoliticalParty)
                 .Where(x => x.PoliticalPartyId == partyId)

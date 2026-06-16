@@ -99,10 +99,10 @@
                                     </div>
                                 </td>
                                 <td class="py-3">
-                                    <span class="text-muted">@assignment.PoliticalPartyName</span>
-                                    @if (!string.IsNullOrEmpty(assignment.PoliticalPartyAcronym))
+                                    <span class="text-muted">@assignment.CandidateOriginPartyName</span>
+                                    @if (!string.IsNullOrEmpty(assignment.CandidateOriginPartyAcronym))
                                     {
-                                        <span class="badge bg-secondary ms-1">@assignment.PoliticalPartyAcronym</span>
+                                        <span class="badge bg-secondary ms-1">@assignment.CandidateOriginPartyAcronym</span>
                                     }
                                 </td>
                                 <td class="py-3 text-muted">@assignment.ElectedOfficeName</td>

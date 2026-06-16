@@ -8,6 +8,8 @@ namespace eVote360_Pro.WebApp.Models.CandidateOfficeAssignment
         public string ElectedOfficeName { get; set; } = string.Empty;
         public string PoliticalPartyName { get; set; } = string.Empty;
         public string PoliticalPartyAcronym { get; set; } = string.Empty;
+        public string CandidateOriginPartyName { get; set; } = string.Empty;
+        public string CandidateOriginPartyAcronym { get; set; } = string.Empty;
         public string TypeName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
     }

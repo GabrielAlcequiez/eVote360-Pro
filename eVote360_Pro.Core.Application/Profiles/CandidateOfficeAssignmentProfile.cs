@@ -24,7 +24,13 @@ namespace eVote360_Pro.Core.Application.Profiles
             opt => opt.MapFrom(src => src.PoliticalParty.Name))
         .ForMember(
             dest => dest.PoliticalPartyAcronym,
-            opt => opt.MapFrom(src => src.PoliticalParty.Acronym));
+            opt => opt.MapFrom(src => src.PoliticalParty.Acronym))
+        .ForMember(
+            dest => dest.CandidateOriginPartyName,
+            opt => opt.MapFrom(src => src.Candidate.PoliticalParty.Name))
+        .ForMember(
+            dest => dest.CandidateOriginPartyAcronym,
+            opt => opt.MapFrom(src => src.Candidate.PoliticalParty.Acronym));
         }
     }
 }
