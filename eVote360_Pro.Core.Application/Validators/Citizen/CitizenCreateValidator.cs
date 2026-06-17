@@ -28,7 +28,10 @@ namespace eVote360_Pro.Core.Application.Validators.Citizen
 
             RuleFor(x => x.DocumentNumber)
                 .NotEmpty().WithMessage("El número de documento es requerido.")
-                .MaximumLength(20).WithMessage("El número de documento no puede superar los 20 caracteres.")
+                .Must(dn => {
+                    var clean = dn.Replace("-", "").Trim();
+                    return clean.Length == 11 && clean.All(char.IsDigit);
+                }).WithMessage("El número de documento debe tener exactamente 11 dígitos.")
                 .MustAsync(BeUniqueDocumentNumber)
                 .WithMessage("Ya hay un ciudadano registrado con este número de documento.");
         }
@@ -36,7 +39,8 @@ namespace eVote360_Pro.Core.Application.Validators.Citizen
         // helpers
         private async Task<bool>BeUniqueDocumentNumber(string documentNumber, CancellationToken ct)
         {
-            var existing = await _repository.GetByDocumentNumber(documentNumber.Trim());
+            var clean = documentNumber.Replace("-", "").Trim();
+            var existing = await _repository.GetByDocumentNumber(clean);
             return existing == null;
         }
 

@@ -43,7 +43,7 @@ namespace eVote360_Pro.Core.Application.Services
                 dto.Name,
                 dto.LastName,
                 dto.Email,
-                dto.DocumentNumber
+                dto.DocumentNumber.Replace("-", "").Trim()
             );
 
             await _repository.AddAsync(citizen);
@@ -88,7 +88,7 @@ namespace eVote360_Pro.Core.Application.Services
 
             if (await _repository.HasBeenUsedInAnyElectionAsync(dto.Id))
             {
-                if(citizen.DocumentNumber != dto.DocumentNumber)
+                if(citizen.DocumentNumber != dto.DocumentNumber.Replace("-", "").Trim())
                 {
                     throw new InvalidOperationException("No se puede actualizar el documento de identidad de este ciudadano porque ya participó en una elección.");
                 }
@@ -109,7 +109,7 @@ namespace eVote360_Pro.Core.Application.Services
                         dto.Name,
                         dto.LastName,
                         dto.Email,
-                        dto.DocumentNumber,
+                        dto.DocumentNumber.Replace("-", "").Trim(),
                         dto.IsActive
                     );
             }

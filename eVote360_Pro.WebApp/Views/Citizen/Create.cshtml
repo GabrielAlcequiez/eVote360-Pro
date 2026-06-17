@@ -43,7 +43,7 @@
 
                     <div class="mb-4">
                         <label asp-for="DocumentNumber" class="form-label" style="font-size: 0.85rem; font-weight: 500; color: #475569;">Número de documento</label>
-                        <input asp-for="DocumentNumber" class="form-control" placeholder="Ej: 00112345678" style="border-radius: 10px; padding: 10px 14px;" />
+                        <input asp-for="DocumentNumber" class="form-control" id="cedulaInput" placeholder="001-0000000-0" style="border-radius: 10px; padding: 10px 14px;" autocomplete="off" />
                         <span asp-validation-for="DocumentNumber" class="text-danger" style="font-size: 0.8rem;"></span>
                     </div>
 
@@ -61,4 +61,28 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        const cedulaInput = document.getElementById('cedulaInput');
+        if (cedulaInput) {
+            cedulaInput.addEventListener('input', function (e) {
+                let val = e.target.value.replace(/\D/g, '');
+                if (val.length > 11) {
+                    val = val.substring(0, 11);
+                }
+                
+                let formatted = '';
+                if (val.length > 0) {
+                    formatted += val.substring(0, Math.min(val.length, 3));
+                }
+                if (val.length > 3) {
+                    formatted += '-' + val.substring(3, Math.min(val.length, 10));
+                }
+                if (val.length > 10) {
+                    formatted += '-' + val.substring(10, 11);
+                }
+                
+                e.target.value = formatted;
+            });
+        }
+    </script>
 }

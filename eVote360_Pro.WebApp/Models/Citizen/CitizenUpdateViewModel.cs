@@ -21,7 +21,8 @@ namespace eVote360_Pro.WebApp.Models.Citizen
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El número de documento es requerido.")]
-        [MaxLength(20, ErrorMessage = "El número de documento no puede superar los 20 caracteres.")]
+        [RegularExpression(@"^\d{3}-?\d{7}-?\d{1}$", ErrorMessage = "El formato de la cédula dominicana debe ser ###-#######-# o 11 dígitos.")]
+        [StringLength(13, MinimumLength = 11, ErrorMessage = "El número de documento debe tener exactamente 11 dígitos.")]
         public string DocumentNumber { get; set; } = string.Empty;
 
         public bool IsActive { get; set; }
