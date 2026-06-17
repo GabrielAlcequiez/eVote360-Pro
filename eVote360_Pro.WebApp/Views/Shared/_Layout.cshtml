@@ -67,7 +67,7 @@
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item d-flex align-items-center me-3">
-                                <span class="text-muted" style="font-size: 0.9rem;">
+                                <span class="text-light" style="font-size: 0.9rem;">
                                     Hola, <strong class="text-light">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</strong>
                                 </span>
                             </li>
