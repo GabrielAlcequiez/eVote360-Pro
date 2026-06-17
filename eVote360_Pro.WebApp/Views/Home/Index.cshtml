@@ -102,6 +102,73 @@
                 </div>
             </div>
 
+            <!-- Resumen Electoral por Año -->
+            <div class="card border-secondary-subtle shadow-sm mb-5">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="h6 text-uppercase text-muted mb-0 font-weight-bold" style="letter-spacing: 0.5px;">Resumen Electoral por Año</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (Model.AvailableYears.Any())
+                    {
+                        <form method="get" action="@Url.Action("Index", "Home")" class="row g-3 align-items-end mb-4">
+                            <div class="col-md-4 col-sm-6">
+                                <label for="yearSelect" class="form-label text-muted small font-weight-medium">Año Electoral</label>
+                                <select id="yearSelect" name="year" class="form-select" style="border-radius: 6px;">
+                                    @foreach (var yr in Model.AvailableYears)
+                                    {
+                                        <!option value="@yr" @(Model.SelectedYear == yr ? "selected" : null)>@yr</!option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <button type="submit" class="btn btn-primary w-100" style="border-radius: 6px;">Obtener Resumen Electoral</button>
+                            </div>
+                        </form>
+
+                        @if (Model.ElectionsForSelectedYear.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table align-middle table-hover mb-0" style="font-size: 0.95rem;">
+                                    <thead class="table-light text-uppercase text-muted small" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                        <tr>
+                                            <th>Nombre de la Elección</th>
+                                            <th>Fecha de Realización</th>
+                                            <th class="text-center">Partidos Participantes</th>
+                                            <th class="text-center">Candidatos Participantes</th>
+                                            <th class="text-center">Ciudadanos que Votaron</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-dark">
+                                        @foreach (var election in Model.ElectionsForSelectedYear)
+                                        {
+                                            <tr>
+                                                <td class="fw-semibold">@election.Name</td>
+                                                <td>@election.ScheduledDate.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-center">@election.ParticipatingPartiesCount</td>
+                                                <td class="text-center">@election.ParticipatingCandidatesCount</td>
+                                                <td class="text-center">@election.VotedCitizensCount.ToString("N0")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info text-center mb-0" role="alert" style="border-radius: 8px;">
+                                No existen elecciones registradas para el año seleccionado.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center mb-0" role="alert" style="border-radius: 8px;">
+                            No existen elecciones registradas en el sistema.
+                        </div>
+                    }
+                </div>
+            </div>
+
             <!-- Fila de Elección Activa y Resultados -->
             @if (!string.IsNullOrEmpty(Model.ResultsElectionName))
             {
@@ -249,15 +316,103 @@
         }
         else if (isLeader)
         {
+            var leaderDashboard = ViewBag.LeaderDashboard as eVote360_Pro.Core.Application.DTOs.Dashboard.LeaderDashboardGetDto;
+
             <!-- Panel de Dirigente -->
-            <h2 class="h5 mb-4 text-secondary text-uppercase" style="letter-spacing: 0.5px; font-weight: 600;">Panel de Dirigente</h2>
+            <div class="row g-4 mb-4">
+                <!-- Información del Partido -->
+                <div class="col-lg-4">
+                    <div class="card border-secondary-subtle shadow-sm h-100">
+                        <div class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                            <h5 class="h6 text-uppercase text-muted mb-3 font-weight-bold" style="letter-spacing: 0.5px;">Mi Partido Político</h5>
+                            @if (leaderDashboard != null)
+                            {
+                                <h3 class="h5 text-dark font-weight-bold mb-1">@leaderDashboard.PartyName</h3>
+                                <span class="badge bg-secondary px-3 py-1.5 fs-6 mb-3">@leaderDashboard.PartyAcronym</span>
+                                
+                                @if (!string.IsNullOrEmpty(leaderDashboard.PartyLogo))
+                                {
+                                    <div class="my-2">
+                                        <img src="@leaderDashboard.PartyLogo" alt="Logo de @leaderDashboard.PartyName" class="img-fluid border border-secondary-subtle rounded-3 p-2 bg-light shadow-sm" style="max-height: 120px; object-fit: contain;" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted font-italic my-4">
+                                        [Sin Logo Registrado]
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-danger small">No se pudo cargar la información del partido.</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indicadores de Gestión del Partido -->
+                <div class="col-lg-8">
+                    <div class="card border-secondary-subtle shadow-sm h-100">
+                        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                            <h5 class="h6 text-uppercase text-muted mb-0 font-weight-bold" style="letter-spacing: 0.5px;">Indicadores de Gestión</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            @if (leaderDashboard != null)
+                            {
+                                <div class="row g-3">
+                                    <div class="col-6 col-md-4">
+                                        <div class="p-3 bg-light rounded border text-center shadow-sm">
+                                            <span class="d-block h3 mb-1 text-primary fw-bold">@leaderDashboard.ActiveCandidatesCount</span>
+                                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Candidatos Activos</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <div class="p-3 bg-light rounded border text-center shadow-sm">
+                                            <span class="d-block h3 mb-1 text-secondary fw-bold">@leaderDashboard.InactiveCandidatesCount</span>
+                                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Candidatos Inactivos</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <div class="p-3 bg-light rounded border text-center shadow-sm">
+                                            <span class="d-block h3 mb-1 text-success fw-bold">@leaderDashboard.AssignedCandidatesCount</span>
+                                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Asignados a Puestos</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-6">
+                                        <div class="p-3 bg-light rounded border text-center shadow-sm">
+                                            <span class="d-block h3 mb-1 text-info fw-bold">@leaderDashboard.AlliancesCount</span>
+                                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Alianzas Aprobadas</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-6">
+                                        <div class="p-3 bg-light rounded border text-center shadow-sm position-relative">
+                                            <span class="d-block h3 mb-1 text-warning fw-bold">@leaderDashboard.PendingAlliancesCount</span>
+                                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Solicitudes Alianza Pendientes</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted text-center py-5">
+                                    No hay indicadores disponibles.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesos Directos de Navegación -->
+            <h2 class="h5 mb-4 mt-5 text-secondary text-uppercase" style="letter-spacing: 0.5px; font-weight: 600;">Accesos Directos</h2>
             <div class="row g-4">
                 <!-- Alianzas -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-secondary-subtle shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h3 class="h5 card-title text-success font-weight-bold">Alianzas Políticas</h3>
-                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h3 class="h5 card-title text-success font-weight-bold mb-2">Alianzas Políticas</h3>
+                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem; line-height: 1.5;">
                                 Gestiona las alianzas políticas con otros partidos o revisa solicitudes recibidas.
                             </p>
                             <a asp-controller="PoliticalAlliance" asp-action="Index" class="btn btn-outline-success w-100 mt-3" style="border-radius: 6px;">Ir a Alianzas</a>
@@ -268,9 +423,9 @@
                 <!-- Candidatos -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-secondary-subtle shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h3 class="h5 card-title text-success font-weight-bold">Candidatos</h3>
-                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h3 class="h5 card-title text-success font-weight-bold mb-2">Candidatos</h3>
+                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem; line-height: 1.5;">
                                 Postula candidatos de tu partido político a los diferentes cargos electivos.
                             </p>
                             <a asp-controller="Candidate" asp-action="Index" class="btn btn-outline-success w-100 mt-3" style="border-radius: 6px;">Ir a Candidatos</a>
@@ -281,9 +436,9 @@
                 <!-- Asignación -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-secondary-subtle shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h3 class="h5 card-title text-success font-weight-bold">Asignación de Puestos</h3>
-                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h3 class="h5 card-title text-success font-weight-bold mb-2">Asignación de Puestos</h3>
+                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem; line-height: 1.5;">
                                 Asigna tus candidatos a puestos disponibles o postula a tus candidatos aliados.
                             </p>
                             <a asp-controller="CandidateOfficeAssignment" asp-action="Index" class="btn btn-outline-success w-100 mt-3" style="border-radius: 6px;">Ir a Asignaciones</a>

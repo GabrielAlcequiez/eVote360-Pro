@@ -16,16 +16,33 @@ public class HomeController : Controller
         _dashboardService = dashboardService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? year)
     {
-        // Si el usuario es Administrador, cargamos las estadísticas para el Dashboard Ejecutivo
-        if (User.Identity?.IsAuthenticated == true && User.IsInRole("Administrator"))
+        if (User.Identity?.IsAuthenticated == true)
         {
-            var dashboardData = await _dashboardService.GetDashboardDataAsync();
-            return View(dashboardData);
+            if (User.IsInRole("Administrator"))
+            {
+                var dashboardData = await _dashboardService.GetDashboardDataAsync(year);
+                return View(dashboardData);
+            }
+            else if (User.IsInRole("PoliticalLeader"))
+            {
+                var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (Guid.TryParse(userIdString, out Guid userId))
+                {
+                    try
+                    {
+                        var leaderDashboardData = await _dashboardService.GetLeaderDashboardDataAsync(userId);
+                        ViewBag.LeaderDashboard = leaderDashboardData;
+                    }
+                    catch (Exception)
+                    {
+                        // Silently handle if party association is not found
+                    }
+                }
+            }
         }
 
-        // De lo contrario (visitante o dirigente), retornamos la vista regular sin modelo de dashboard
         return View(null);
     }
 
