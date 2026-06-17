@@ -86,7 +86,7 @@ namespace eVote360_Pro.Core.Application.Services
             var citizen = await _repository.GetByIdAsync(dto.Id) 
                 ?? throw new KeyNotFoundException("El ciudadano no fue encontrado");
 
-            if (await _repository.HasBeenUsedInElectionAsync(dto.Id))
+            if (await _repository.HasBeenUsedInAnyElectionAsync(dto.Id))
             {
                 if(citizen.DocumentNumber != dto.DocumentNumber)
                 {

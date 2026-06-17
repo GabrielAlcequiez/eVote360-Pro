@@ -1,20 +1,106 @@
+@model List<OfficeResultViewModel>
 @{
     ViewData["Title"] = "Resultados Electorales";
     string electionName = ViewBag.ElectionName;
 }
 
 <div class="container py-4">
-    <div class="mb-3 d-flex align-items-center justify-content-between">
+    <div class="mb-3">
         <a asp-action="Index" class="text-decoration-none text-muted" style="font-size: 0.9rem;">
             ← Volver al listado
         </a>
     </div>
 
-    <div class="text-center py-5">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#64748b" viewBox="0 0 16 16" class="mb-3">
-            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-        </svg>
+    <div class="text-center mb-4">
         <h2 class="h3 font-weight-bold mb-1" style="color: #0f172a;">@electionName</h2>
-        <p class="text-muted mb-4">Los resultados detallados estarán disponibles una vez se implemente el módulo de votación.</p>
+        <p class="text-muted mb-0" style="font-size: 0.95rem;">Resultados electorales desglosados por puesto electivo.</p>
     </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted">No hay resultados disponibles para esta elección.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var office in Model)
+        {
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header bg-white py-3 px-4 border-bottom">
+                    <h4 class="mb-0 font-weight-bold" style="color: #0f172a;">@office.OfficeName</h4>
+                    <small class="text-muted">Total de votos: @office.TotalVotes.ToString("N0")</small>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table align-middle mb-0" style="font-size: 0.9rem;">
+                        <thead class="bg-light" style="color: #475569; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px;">
+                            <tr>
+                                <th class="px-4 py-3" style="width: 40px;">#</th>
+                                <th class="py-3">Candidato</th>
+                                <th class="py-3">Partido</th>
+                                <th class="py-3 text-center" style="width: 100px;">Votos</th>
+                                <th class="px-4 py-3 text-end" style="width: 100px;">Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: #334155;">
+                            @{
+                                var hasTie = office.Candidates.Any(c => c.IsTie);
+                                int rank = 1;
+                            }
+                            @if (hasTie)
+                            {
+                                <tr>
+                                    <td colspan="5" class="px-4 py-3 text-center text-warning fw-semibold" style="background-color: #fffbeb;">
+                                        Existe un empate en el primer lugar para este puesto electivo.
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var candidate in office.Candidates)
+                            {
+                                var isWinnerRow = candidate.IsWinner;
+                                <tr class="border-bottom @(isWinnerRow ? "table-success" : "")">
+                                    <td class="px-4 py-3 text-center fw-bold">@rank</td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (!string.IsNullOrEmpty(candidate.Photo))
+                                            {
+                                                <img src="@candidate.Photo" alt="@candidate.CandidateName" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;" />
+                                            }
+                                            <span class="fw-medium">@candidate.CandidateName</span>
+                                            @if (isWinnerRow)
+                                            {
+                                                <span class="badge bg-success ms-1" style="font-size: 0.7rem;">Ganador</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (!string.IsNullOrEmpty(candidate.PartyLogo))
+                                            {
+                                                <img src="@candidate.PartyLogo" alt="@candidate.PartyAcronym" style="width: 20px; height: 20px; object-fit: cover;" />
+                                            }
+                                            <span>@candidate.PartyName (@candidate.PartyAcronym)</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-center fw-semibold">@candidate.VoteCount.ToString("N0")</td>
+                                    <td class="px-4 py-3 text-end">
+                                        <div class="d-flex align-items-center justify-content-end gap-2">
+                                            <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
+                                                <div class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: @candidate.Percentage.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)%;"
+                                                     aria-valuenow="@candidate.Percentage" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <span class="text-muted" style="font-size: 0.85rem;">@candidate.Percentage.ToString("0.0")%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                rank++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
 </div>

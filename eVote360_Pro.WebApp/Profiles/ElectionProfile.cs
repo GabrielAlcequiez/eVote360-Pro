@@ -10,6 +10,9 @@ namespace eVote360_Pro.WebApp.Profiles
         {
             CreateMap<ElectionListDto, ElectionGetViewModel>();
             CreateMap<ElectionCreateViewModel, ElectionCreateDto>();
+
+            CreateMap<OfficeResultDto, OfficeResultViewModel>();
+            CreateMap<CandidateResultDto, CandidateResultViewModel>();
         }
     }
 }

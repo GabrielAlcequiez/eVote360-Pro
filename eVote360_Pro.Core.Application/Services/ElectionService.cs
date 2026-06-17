@@ -17,6 +17,7 @@ namespace eVote360_Pro.Core.Application.Services
         private readonly IElectedOfficeRepository _electedOfficeRepository;
         private readonly IPoliticalPartyRepository _politicalPartyRepository;
         private readonly ICandidateOfficeAssignmentRepository _candidateOfficeAssignmentRepository;
+        private readonly IVoteRepository _voteRepository;
         private readonly IMapper _mapper;
 
         public ElectionService(
@@ -26,6 +27,7 @@ namespace eVote360_Pro.Core.Application.Services
             IElectedOfficeRepository electedOfficeRepository,
             IPoliticalPartyRepository politicalPartyRepository,
             ICandidateOfficeAssignmentRepository candidateOfficeAssignmentRepository,
+            IVoteRepository voteRepository,
             IMapper mapper)
         {
             _repository = repository;
@@ -34,6 +36,7 @@ namespace eVote360_Pro.Core.Application.Services
             _electedOfficeRepository = electedOfficeRepository;
             _politicalPartyRepository = politicalPartyRepository;
             _candidateOfficeAssignmentRepository = candidateOfficeAssignmentRepository;
+            _voteRepository = voteRepository;
             _mapper = mapper;
         }
 
@@ -96,6 +99,9 @@ namespace eVote360_Pro.Core.Application.Services
             var election = await _repository.GetByIdAsync(id);
             if (election is null)
                 throw new InvalidOperationException("La elección no existe.");
+
+            if (await _repository.ValidateNoActiveElectionAsync())
+                throw new InvalidOperationException("Ya existe una elección activa.");
 
             election.Activate();
 
@@ -160,18 +166,16 @@ namespace eVote360_Pro.Core.Application.Services
             var activeOffices = await _electedOfficeRepository.GetActiveElectedOffice();
             var activeParties = await _politicalPartyRepository.GetActivePoliticalPartiesAsync();
 
-            var list = elections
-                .OrderByDescending(e => e.Status == ElectionStatus.Active ? 1 : 0)
-                .ThenByDescending(e => e.ScheduledDate)
-                .Select(e =>
-                {
-                    var dto = _mapper.Map<ElectionListDto>(e);
-                    dto.PartyCount = activeParties.Count;
-                    dto.OfficeCount = activeOffices.Count;
-                    dto.VoterCount = 0;
-                    return dto;
-                })
-                .ToList();
+            var list = new List<ElectionListDto>();
+
+            foreach (var e in elections.OrderByDescending(x => x.Status == ElectionStatus.Active ? 1 : 0).ThenByDescending(x => x.ScheduledDate))
+            {
+                var dto = _mapper.Map<ElectionListDto>(e);
+                dto.PartyCount = activeParties.Count;
+                dto.OfficeCount = activeOffices.Count;
+                dto.VoterCount = await _repository.GetVoterCountByElectionAsync(e.Id);
+                list.Add(dto);
+            }
 
             return list.AsReadOnly();
         }
@@ -180,6 +184,63 @@ namespace eVote360_Pro.Core.Application.Services
         {
             var election = await _repository.GetByIdAsync(id);
             return election is null ? null : _mapper.Map<ElectionGetDto>(election);
+        }
+
+        public async Task<List<OfficeResultDto>> GetElectionResultsAsync(Guid electionId)
+        {
+            var votes = await _voteRepository.GetVotesByElectionWithDetailsAsync(electionId);
+
+            var results = new List<OfficeResultDto>();
+
+            foreach (var officeGroup in votes.GroupBy(v => v.ElectedOffice))
+            {
+                var totalVotesInOffice = officeGroup.Count();
+
+                var candidates = officeGroup
+                    .GroupBy(v => new { CandidateId = v.CandidateId, v.Candidate })
+                    .Select(cg =>
+                    {
+                        var candidate = cg.Key.Candidate;
+                        return new CandidateResultDto
+                        {
+                            CandidateName = candidate != null ? $"{candidate.Name} {candidate.LastName}" : "Ninguno",
+                            Photo = candidate?.Photo,
+                            PartyName = candidate?.PoliticalParty?.Name ?? "No aplica",
+                            PartyAcronym = candidate?.PoliticalParty?.Acronym ?? "No aplica",
+                            PartyLogo = candidate?.PoliticalParty?.Logo,
+                            VoteCount = cg.Count(),
+                            Percentage = totalVotesInOffice > 0
+                                ? Math.Round((decimal)cg.Count() / totalVotesInOffice * 100, 1)
+                                : 0,
+                            TotalVotes = totalVotesInOffice
+                        };
+                    })
+                    .OrderByDescending(c => c.VoteCount)
+                    .ToList();
+
+                var maxVotes = candidates.FirstOrDefault()?.VoteCount;
+                var topCandidates = candidates.Where(c => c.VoteCount == maxVotes && maxVotes > 0).ToList();
+
+                if (topCandidates.Count == 1)
+                {
+                    topCandidates[0].IsWinner = true;
+                }
+                else if (topCandidates.Count > 1)
+                {
+                    foreach (var c in topCandidates)
+                        c.IsTie = true;
+                }
+
+                results.Add(new OfficeResultDto
+                {
+                    OfficeName = officeGroup.Key.Name,
+                    TotalVotes = totalVotesInOffice,
+                    Candidates = candidates
+                });
+            }
+
+            results = results.OrderBy(o => o.OfficeName).ToList();
+            return results;
         }
     }
 }

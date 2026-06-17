@@ -71,6 +71,7 @@ namespace eVote360_Pro.Persistence.Repositories
             return await _context.CandidateOfficeAssignments
                 .Include(x => x.Candidate)
                 .Include(x => x.ElectedOffice)
+                .Include(x => x.PoliticalParty)
                 .Where(x => x.Candidate.IsActive && x.ElectedOffice.IsActive)
                 .AsNoTracking()
                 .ToListAsync();

@@ -160,8 +160,11 @@ namespace eVote360_Pro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var resultDtos = await _electionService.GetElectionResultsAsync(id);
+            var vm = _mapper.Map<List<OfficeResultViewModel>>(resultDtos);
+
             ViewBag.ElectionName = dto.Name;
-            return View();
+            return View(vm);
         }
     }
 }

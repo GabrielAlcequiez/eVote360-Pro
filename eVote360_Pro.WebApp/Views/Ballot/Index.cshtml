@@ -1,0 +1,85 @@
+@model List<OfficeViewModel>
+@{
+    ViewData["Title"] = "Puestos Electivos Disponibles";
+    bool allSelected = ViewBag.AllSelected;
+}
+
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="h3 font-weight-bold mb-1" style="color: #0f172a;">@ViewData["Title"]</h2>
+        <p class="text-muted mb-0" style="font-size: 0.95rem;">Seleccione un candidato para cada puesto electivo.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: rgba(16, 185, 129, 0.1); color: #065f46;" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: rgba(239, 68, 68, 0.1); color: #991b1b;" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            @if (Model == null || !Model.Any())
+            {
+                <div class="card border-0 shadow-sm p-5 text-center" style="border-radius: 16px;">
+                    <p class="text-muted mb-0">No hay puestos electivos disponibles para esta elección.</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var office in Model)
+                {
+                    <div class="card border-0 shadow-sm mb-3" style="border-radius: 16px; overflow: hidden;">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="font-weight-bold mb-1" style="color: #0f172a;">@office.OfficeName</h5>
+                                    <small class="text-muted">
+                                        @office.PartyCount partido(s) participante(s) &middot; @office.CandidateCount candidato(s)
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    @if (office.HasSelection)
+                                    {
+                                        <span class="badge bg-success me-2" style="font-size: 0.8rem;">Seleccionado</span>
+                                    }
+                                    <a asp-action="VoteForOffice" asp-route-id="@office.OfficeId" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 8px;">
+                                        @(office.HasSelection ? "Modificar" : "Seleccionar")
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="text-center mt-4">
+                    @if (allSelected)
+                    {
+                        <form asp-action="Finalize" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success btn-lg px-5 py-2" style="border-radius: 10px;">
+                                Finalizar votación
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary btn-lg px-5 py-2" style="border-radius: 10px; cursor: not-allowed;" disabled>
+                            Finalizar votación
+                        </button>
+                        <p class="text-muted mt-2" style="font-size: 0.85rem;">Debe seleccionar una opción para todos los puestos antes de finalizar.</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

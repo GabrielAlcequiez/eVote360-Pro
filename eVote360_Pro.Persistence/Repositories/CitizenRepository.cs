@@ -22,9 +22,19 @@ namespace eVote360_Pro.Persistence.Repositories
             return await _context.Citizens.FirstOrDefaultAsync(x => x.Name == name);
         }
 
-        public async Task<bool> HasBeenUsedInElectionAsync(Guid id)
+        public async Task<bool> HasBeenUsedInElectionAsync(Guid id, Guid electionId)
+        {
+            return await _context.CitizenParticipations.AnyAsync(x => x.CitizenId == id && x.ElectionId == electionId);
+        }
+
+        public async Task<bool> HasBeenUsedInAnyElectionAsync(Guid id)
         {
             return await _context.CitizenParticipations.AnyAsync(x => x.CitizenId == id);
+        }
+
+        public async Task AddParticipationAsync(CitizenParticipation participation)
+        {
+            await _context.CitizenParticipations.AddAsync(participation);
         }
     }
 }

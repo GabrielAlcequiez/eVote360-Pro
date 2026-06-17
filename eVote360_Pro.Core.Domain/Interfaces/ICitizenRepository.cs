@@ -8,7 +8,8 @@ namespace eVote360_Pro.Core.Domain.Interfaces
         Task<Citizen?> GetByEmail(string email);
         Task<Citizen?> GetByDocumentNumber(string documentNumber);
 
-        Task<bool> HasBeenUsedInElectionAsync(Guid id);
-
+        Task<bool> HasBeenUsedInElectionAsync(Guid id, Guid electionId);
+        Task<bool> HasBeenUsedInAnyElectionAsync(Guid id);
+        Task AddParticipationAsync(CitizenParticipation participation);
     }
 }

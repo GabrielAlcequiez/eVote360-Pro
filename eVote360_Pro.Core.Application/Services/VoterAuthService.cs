@@ -50,7 +50,7 @@ namespace eVote360_Pro.Core.Application.Services
             var activeElection = await _electionRepository.GetActiveElectionAsync() ?? throw new InvalidOperationException("No hay ninguna elección activa en este momento.");
 
             // Verificar si el ciudadano ya votó en esta elección activa
-            var alreadyVoted = await _citizenRepository.HasBeenUsedInElectionAsync(citizen.Id);
+            var alreadyVoted = await _citizenRepository.HasBeenUsedInElectionAsync(citizen.Id, activeElection.Id);
             if (alreadyVoted)
                 throw new InvalidOperationException("El ciudadano ya ha ejercido su voto en esta elección.");
 

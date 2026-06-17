@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using eVote360_Pro.Core.Application.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,11 @@ namespace eVote360_Pro.Infrastructure.Services
     public partial class OcrService(ILogger<OcrService> logger) : IOcrService
     {
         private readonly ILogger<OcrService> _logger = logger;
-        private readonly string _tessDataPath = Path.Combine(AppContext.BaseDirectory, "tessdata");
+
+        // asignación dinamica por que estoy usando arch linux
+        private readonly string _tessDataPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? Path.Combine(AppContext.BaseDirectory, "tessdata")
+            : "/usr/share/tessdata/"; // ruta estandar de arch
 
         public Task<string?> ExtractDocumentNumberAsync(Stream imageStream)
         {
@@ -20,7 +25,7 @@ namespace eVote360_Pro.Infrastructure.Services
                     imageStream.CopyTo(ms);
                     imageBytes = ms.ToArray();
                 }
-
+                
                 _logger.LogInformation("Iniciando Tesseract OCR en ruta: {Path}", _tessDataPath);
                 using var engine = new TesseractEngine(_tessDataPath, "spa", EngineMode.Default);
                 using var pix = Pix.LoadFromMemory(imageBytes);
@@ -80,7 +85,7 @@ namespace eVote360_Pro.Infrastructure.Services
 
         [GeneratedRegex(@"\b\d{3}-\d{7}-\d{1}\b")]
         private static partial Regex RegexDashes();
-       
+
         [GeneratedRegex(@"\b\d{11}\b")]
         private static partial Regex RegexNumber();
     }

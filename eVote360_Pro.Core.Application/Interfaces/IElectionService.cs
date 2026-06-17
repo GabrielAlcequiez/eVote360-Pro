@@ -9,5 +9,6 @@ namespace eVote360_Pro.Core.Application.Interfaces
         Task<bool> FinishElection(Guid id);
         Task<IReadOnlyList<ElectionListDto>> GetAllAsync();
         Task<ElectionGetDto?> GetByIdAsync(Guid id);
+        Task<List<OfficeResultDto>> GetElectionResultsAsync(Guid electionId);
     }
 }

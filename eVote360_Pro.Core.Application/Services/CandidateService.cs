@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.Candidate;
 using eVote360_Pro.Core.Application.Interfaces;
@@ -17,6 +18,7 @@ namespace eVote360_Pro.Core.Application.Services
         private readonly IValidator<CandidateCreateDto> _createValidator;
         private readonly IValidator<CandidateUpdateDto> _updateValidator;
         private readonly IElectionRepository _electionRepository;
+        private readonly ICandidateOfficeAssignmentRepository _candidateOfficeAssignmentRepository;
         private readonly IMapper _mapper;
         public CandidateService(
             IUnitOfWork unitOfWork,
@@ -25,6 +27,7 @@ namespace eVote360_Pro.Core.Application.Services
             IValidator<CandidateCreateDto> createValidator,
             IValidator<CandidateUpdateDto> updateValidator,
             IElectionRepository electionRepository,
+            ICandidateOfficeAssignmentRepository candidateOfficeAssignmentRepository,
             IMapper mapper
             )
         {
@@ -34,6 +37,7 @@ namespace eVote360_Pro.Core.Application.Services
             _createValidator = createValidator;
             _updateValidator = updateValidator;
             _electionRepository = electionRepository;
+            _candidateOfficeAssignmentRepository = candidateOfficeAssignmentRepository;
             _mapper = mapper;
 
         }
@@ -84,9 +88,10 @@ namespace eVote360_Pro.Core.Application.Services
                 
             if(candidate.PoliticalPartyId != partyLeader.PoliticalPartyId)
                 throw new InvalidOperationException("Este candidato no pertenece al partido politico del dirigente autenticado");
-
-            // VALIDACION PENDIENTE DE IMPLEMENTAR VALIDAR QUE NO TENGA ASIGNACIONES A PUESTOS
-
+            
+            if(await _candidateOfficeAssignmentRepository.CandidateHasOfficeAssigned(candidate.Id, candidate.PoliticalPartyId))
+                throw new InvalidOperationException("No se puede desactivar un candidato mientras exista una elección activa.");
+                
             _ = await _repository.SoftDeleteAsync(id)
                 ?? throw new KeyNotFoundException("El candidato no existe");
             await _unitOfWork.CompleteAsync();
