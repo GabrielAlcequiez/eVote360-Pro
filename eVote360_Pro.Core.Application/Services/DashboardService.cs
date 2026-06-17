@@ -19,7 +19,10 @@ namespace eVote360_Pro.Core.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<CitizenParticipation> _participationRepository;
         private readonly IElectionService _electionService;
-
+        private readonly ICandidateOfficeAssignmentRepository _candidateOfficeAssignmentRepository;
+        private readonly IPartyLeaderRepository _partyLeaderRepository;
+        private readonly IPoliticalAllianceRepository _politicalAllianceRepository;
+ 
         public DashboardService(
             ICitizenRepository citizenRepository,
             IElectionRepository electionRepository,
@@ -28,7 +31,10 @@ namespace eVote360_Pro.Core.Application.Services
             IElectedOfficeRepository electedOfficeRepository,
             IUserRepository userRepository,
             IBaseRepository<CitizenParticipation> participationRepository,
-            IElectionService electionService)
+            IElectionService electionService,
+            ICandidateOfficeAssignmentRepository candidateOfficeAssignmentRepository,
+            IPartyLeaderRepository partyLeaderRepository,
+            IPoliticalAllianceRepository politicalAllianceRepository)
         {
             _citizenRepository = citizenRepository;
             _electionRepository = electionRepository;
@@ -38,9 +44,12 @@ namespace eVote360_Pro.Core.Application.Services
             _userRepository = userRepository;
             _participationRepository = participationRepository;
             _electionService = electionService;
+            _candidateOfficeAssignmentRepository = candidateOfficeAssignmentRepository;
+            _partyLeaderRepository = partyLeaderRepository;
+            _politicalAllianceRepository = politicalAllianceRepository;
         }
 
-        public async Task<DashboardGetDto> GetDashboardDataAsync()
+        public async Task<DashboardGetDto> GetDashboardDataAsync(int? year = null)
         {
             // 1. Obtener contadores básicos de Ciudadanos
             var citizens = await _citizenRepository.GetAllAsync();
@@ -102,9 +111,9 @@ namespace eVote360_Pro.Core.Application.Services
             }
 
             // 5. Cargar participación y resultados si hay una elección disponible
+            var participations = await _participationRepository.GetAllAsync();
             if (targetElectionForResults != null)
             {
-                var participations = await _participationRepository.GetAllAsync();
                 var votedCount = participations.Count(p => p.ElectionId == targetElectionForResults.Id);
 
                 dto.ResultsElectionName = targetElectionForResults.Name;
@@ -119,7 +128,78 @@ namespace eVote360_Pro.Core.Application.Services
                 dto.ElectionResults = results ?? new();
             }
 
+            // 6. Resumen electoral por año
+            var availableYears = elections
+                .Select(e => e.ScheduledDate.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToList();
+
+            dto.AvailableYears = availableYears;
+            int? selectedYear = year ?? availableYears.FirstOrDefault();
+            dto.SelectedYear = selectedYear;
+
+            if (selectedYear.HasValue)
+            {
+                var assignments = await _candidateOfficeAssignmentRepository.GetActiveCandidateOfficeAssignmentsAsync();
+                var participatingPartiesCount = assignments.Select(a => a.PoliticalPartyId).Distinct().Count();
+                var participatingCandidatesCount = assignments.Select(a => a.CandidateId).Distinct().Count();
+
+                var electionsInYear = elections.Where(e => e.ScheduledDate.Year == selectedYear.Value).ToList();
+                foreach (var election in electionsInYear)
+                {
+                    dto.ElectionsForSelectedYear.Add(new ElectionSummaryDto
+                    {
+                        Id = election.Id,
+                        Name = election.Name,
+                        ScheduledDate = election.ScheduledDate,
+                        ParticipatingPartiesCount = participatingPartiesCount,
+                        ParticipatingCandidatesCount = participatingCandidatesCount,
+                        VotedCitizensCount = participations.Count(p => p.ElectionId == election.Id)
+                    });
+                }
+            }
+
             return dto;
+        }
+
+        public async Task<LeaderDashboardGetDto> GetLeaderDashboardDataAsync(Guid userId)
+        {
+            var leader = await _partyLeaderRepository.GetPartyLeaderDetailsAsync(userId);
+            if (leader == null || leader.PoliticalParty == null)
+            {
+                throw new InvalidOperationException("No tiene un partido político asignado.");
+            }
+
+            var partyId = leader.PoliticalPartyId;
+
+            // 1. Cantidad de candidatos activos e inactivos del partido
+            var candidates = await _candidateRepository.GetAllAsync();
+            var activeCandidatesCount = candidates.Count(c => c.PoliticalPartyId == partyId && c.IsActive);
+            var inactiveCandidatesCount = candidates.Count(c => c.PoliticalPartyId == partyId && !c.IsActive);
+
+            // 2. Alianzas políticas aprobadas (estado Aceptada)
+            var alliances = await _politicalAllianceRepository.GetAllByPartyIdWithDetailsAsync(partyId);
+            var alliancesCount = alliances.Count(a => a.Status == AllianceStatus.Accepted);
+
+            // 3. Solicitudes de alianza pendientes dirigidas al partido del dirigente (receiver)
+            var pendingAlliancesCount = alliances.Count(a => a.Status == AllianceStatus.Pending && a.ReceiverPartyId == partyId);
+
+            // 4. Cantidad de candidatos asignados a puestos electivos
+            var assignments = await _candidateOfficeAssignmentRepository.GetActiveCandidateOfficeAssignmentsAsync();
+            var assignedCandidatesCount = assignments.Count(a => a.Candidate.PoliticalPartyId == partyId);
+
+            return new LeaderDashboardGetDto
+            {
+                PartyName = leader.PoliticalParty.Name,
+                PartyAcronym = leader.PoliticalParty.Acronym,
+                PartyLogo = leader.PoliticalParty.Logo ?? string.Empty,
+                ActiveCandidatesCount = activeCandidatesCount,
+                InactiveCandidatesCount = inactiveCandidatesCount,
+                AlliancesCount = alliancesCount,
+                PendingAlliancesCount = pendingAlliancesCount,
+                AssignedCandidatesCount = assignedCandidatesCount
+            };
         }
     }
 }

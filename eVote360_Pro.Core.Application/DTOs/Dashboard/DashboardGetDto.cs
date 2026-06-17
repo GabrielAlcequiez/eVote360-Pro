@@ -27,5 +27,10 @@ namespace eVote360_Pro.Core.Application.DTOs.Dashboard
         public int VotedCitizensCount { get; set; }
         public decimal VotingParticipationPercentage { get; set; }
         public List<OfficeResultDto> ElectionResults { get; set; } = new();
+
+        // Resumen Electoral por año
+        public List<int> AvailableYears { get; set; } = new();
+        public int? SelectedYear { get; set; }
+        public List<ElectionSummaryDto> ElectionsForSelectedYear { get; set; } = new();
     }
 }
