@@ -18,7 +18,7 @@ namespace eVote360_Pro.Core.Application
             services.AddTransient<IPoliticalAllianceService, PoliticalAllianceService>();
             services.AddTransient<ICandidateOfficeAssignmentService, CandidateOfficeAssignmentService>();
 
-            services.AddTransient<IVoterAuthService, VoterAuthService>();
+            services.AddTransient<IElectionService, ElectionService>();
         }
     }
 }

@@ -24,5 +24,19 @@ namespace eVote360_Pro.Persistence.Repositories
             return await _context.Votes.AnyAsync(x=>x.ElectedOfficeId == id);
 
         }
+
+        public async Task<bool> AnyActiveOfficesAsync()
+        {
+            return await _context.ElectedOffices
+                .AnyAsync(x => x.IsActive);
+        }
+
+        public async Task<IReadOnlyList<ElectedOffice>> GetActiveElectedOffice()
+        {
+            return await _context.ElectedOffices
+                .Where(x => x.IsActive)
+                .AsNoTracking()
+                .ToListAsync();       
+        }
     }
 }

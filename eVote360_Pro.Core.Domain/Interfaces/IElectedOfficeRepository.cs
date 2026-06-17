@@ -7,5 +7,7 @@ namespace eVote360_Pro.Core.Domain.Interfaces
         Task<ElectedOffice?> GetByName(string name);
         Task<bool> HasBeenUsedInElectionAsync(Guid id);
         Task<bool> HasActiveCandidatesAssignedAsync(Guid id);
+        Task<bool> AnyActiveOfficesAsync();
+        Task<IReadOnlyList<ElectedOffice>> GetActiveElectedOffice();
     }
 }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eVote360_Pro.Core.Domain.Entities;
 
 namespace eVote360_Pro.Core.Domain.Interfaces
@@ -13,5 +9,7 @@ namespace eVote360_Pro.Core.Domain.Interfaces
         Task<bool> HasActiveLeaderAsync(Guid id);
         Task<bool> HasParticipatedInElectionAsync(Guid id);
         Task<IReadOnlyList<PoliticalParty>> GetAllWithPartyLeadersAsync();
+        Task<int> CountActivePartiesAsync();
+        Task<IReadOnlyList<PoliticalParty>> GetActivePoliticalPartiesAsync();
     }
 }

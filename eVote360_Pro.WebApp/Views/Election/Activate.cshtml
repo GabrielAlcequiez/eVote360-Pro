@@ -1,0 +1,39 @@
+@model Guid
+@{
+    ViewData["Title"] = "Activar Elección";
+    string electionName = ViewBag.ElectionName;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm p-4 p-md-5 text-center" style="border-radius: 20px; background: #ffffff;">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#10b981" viewBox="0 0 16 16">
+                        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5z"/>
+                    </svg>
+                </div>
+
+                <h2 class="h3 font-weight-bold mb-2" style="color: #0f172a;">¿Está seguro que desea activar esta elección?</h2>
+                <p class="text-muted mb-4" style="font-size: 1rem;">
+                    Al activar <strong>@electionName</strong>, los ciudadanos habilitados podrán iniciar el proceso de votación.
+                </p>
+
+                <p class="text-muted mb-4" style="font-size: 0.85rem;">
+                    El sistema validará que la configuración electoral actual sea correcta antes de activar la elección.
+                </p>
+
+                <form asp-action="ActivateConfirmed" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model" />
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 10px;">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-4 py-2" style="border-radius: 10px;">
+                            Activar elección
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -65,5 +65,15 @@ namespace eVote360_Pro.Persistence.Repositories
                 .Where(x => x.PoliticalPartyId == partyId)
                 .ToListAsync();
         }
+
+        public async Task<IReadOnlyList<CandidateOfficeAssignment>> GetActiveCandidateOfficeAssignmentsAsync()
+        {
+            return await _context.CandidateOfficeAssignments
+                .Include(x => x.Candidate)
+                .Include(x => x.ElectedOffice)
+                .Where(x => x.Candidate.IsActive && x.ElectedOffice.IsActive)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

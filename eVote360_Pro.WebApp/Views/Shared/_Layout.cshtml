@@ -39,6 +39,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-light" asp-area="" asp-controller="Citizen" asp-action="Index">Ciudadanos</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-area="" asp-controller="Election" asp-action="Index">Elecciones</a>
+                                </li>
                             }
                             else if (User.IsInRole(role: "PoliticalLeader"))
                             {

@@ -12,5 +12,6 @@ namespace eVote360_Pro.Core.Domain.Interfaces
         Task<CandidateOfficeAssignment?> GetByIdWithDetailsAsync(Guid id);
         Task<IReadOnlyList<CandidateOfficeAssignment>> GetAllWithDetailsAsync();
         Task<IReadOnlyList<CandidateOfficeAssignment>> GetAllByPartyIdWithDetailsAsync(Guid partyId);
+        Task<IReadOnlyList<CandidateOfficeAssignment>> GetActiveCandidateOfficeAssignmentsAsync();
     }
 }

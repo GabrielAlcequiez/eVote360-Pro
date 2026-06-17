@@ -12,6 +12,20 @@ namespace eVote360_Pro.Persistence.Repositories
 {
     public class PoliticalPartyRepository(AppDbContext context) : BaseRepository<PoliticalParty>(context), IPoliticalPartyRepository
     {
+        public async Task<int> CountActivePartiesAsync()
+        {
+            return await _context.PoliticalParties
+                .CountAsync(x => x.IsActive);
+        }
+
+        public async Task<IReadOnlyList<PoliticalParty>> GetActivePoliticalPartiesAsync()
+        {
+            return await _context.PoliticalParties
+                .Where(x => x.IsActive)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<IReadOnlyList<PoliticalParty>> GetAllWithPartyLeadersAsync()
         {
             return await _context.PoliticalParties
@@ -23,7 +37,7 @@ namespace eVote360_Pro.Persistence.Repositories
 
         public Task<PoliticalParty?> GetByAcronymAsync(string acronym)
         {
-           return _context.PoliticalParties.FirstOrDefaultAsync(p => p.Acronym == acronym);
+            return _context.PoliticalParties.FirstOrDefaultAsync(p => p.Acronym == acronym);
         }
 
         public async Task<bool> HasActiveCandidatesAsync(Guid id)

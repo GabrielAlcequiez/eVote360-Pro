@@ -1,0 +1,126 @@
+@model IReadOnlyList<ElectionGetViewModel>
+@{
+    ViewData["Title"] = "Mantenimiento de Elecciones";
+    bool hasActiveElection = ViewBag.HasActiveElection;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 font-weight-bold mb-1" style="color: #0f172a;">@ViewData["Title"]</h1>
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">Gestiona los procesos electorales del sistema.</p>
+        </div>
+        <div>
+            @if (hasActiveElection)
+            {
+                <button class="btn btn-secondary px-4 py-2" style="border-radius: 10px; cursor: not-allowed;" disabled>
+                    + Crear elección
+                </button>
+            }
+            else
+            {
+                <a asp-action="Create" class="btn btn-primary px-4 py-2" style="border-radius: 10px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); border: none;">
+                    + Crear elección
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: rgba(16, 185, 129, 0.1); color: #065f46;" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: rgba(239, 68, 68, 0.1); color: #991b1b;" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden; background: #ffffff;">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0" style="font-size: 0.95rem;">
+                <thead class="bg-light" style="color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.8px;">
+                    <tr>
+                        <th class="px-4 py-3">Nombre</th>
+                        <th class="py-3">Fecha</th>
+                        <th class="py-3">Estado</th>
+                        <th class="py-3 text-center">Partidos</th>
+                        <th class="py-3 text-center">Puestos</th>
+                        <th class="py-3 text-center">Votantes</th>
+                        <th class="px-4 py-3 text-end" style="width: 280px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #334155;">
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <p class="mb-0">No hay elecciones registradas en el sistema.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var election in Model)
+                        {
+                            <tr class="border-bottom" style="transition: background 0.2s ease; @(election.Status == ElectionStatus.Active ? "background-color: rgba(16, 185, 129, 0.04);" : "")">
+                                <td class="px-4 py-3">
+                                    <div class="font-weight-medium" style="color: #0f172a; font-weight: 500;">@election.Name</div>
+                                </td>
+                                <td class="py-3 text-muted">@election.ScheduledDate.ToString("dd/MM/yyyy")</td>
+                                <td class="py-3">
+                                    @if (election.Status == ElectionStatus.Active)
+                                    {
+                                        <span class="d-inline-flex align-items-center gap-2" style="color: #10b981; font-weight: 500;">
+                                            <span style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block;"></span>
+                                            Activa
+                                        </span>
+                                    }
+                                    else if (election.Status == ElectionStatus.Pending)
+                                    {
+                                        <span class="d-inline-flex align-items-center gap-2" style="color: #f59e0b; font-weight: 500;">
+                                            <span style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%; display: inline-block;"></span>
+                                            Pendiente
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="d-inline-flex align-items-center gap-2" style="color: #64748b; font-weight: 500;">
+                                            <span style="width: 8px; height: 8px; background-color: #64748b; border-radius: 50%; display: inline-block;"></span>
+                                            Finalizada
+                                        </span>
+                                    }
+                                </td>
+                                <td class="py-3 text-center fw-semibold">@election.PartyCount</td>
+                                <td class="py-3 text-center fw-semibold">@election.OfficeCount</td>
+                                <td class="py-3 text-center fw-semibold">@election.VoterCount.ToString("N0")</td>
+                                <td class="px-4 py-3 text-end">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        @if (election.Status == ElectionStatus.Pending)
+                                        {
+                                            <a asp-action="Activate" asp-route-id="@election.Id" class="btn btn-sm btn-success px-3" style="border-radius: 8px;">Activar</a>
+                                        }
+                                        else if (election.Status == ElectionStatus.Active)
+                                        {
+                                            <a asp-action="Finish" asp-route-id="@election.Id" class="btn btn-sm btn-warning px-3" style="border-radius: 8px;">Finalizar</a>
+                                        }
+                                        else if (election.Status == ElectionStatus.Finalized)
+                                        {
+                                            <a asp-action="Results" asp-route-id="@election.Id" class="btn btn-sm btn-outline-info px-3" style="border-radius: 8px;">Ver resultados</a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
