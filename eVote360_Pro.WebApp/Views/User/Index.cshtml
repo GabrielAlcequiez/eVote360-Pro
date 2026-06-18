@@ -128,30 +128,27 @@
                                         }
 
                                         <!-- Activar/Desactivar -->
-                                        <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post" class="m-0">
-                                            @Html.AntiForgeryToken()
-                                            @if (hasActiveElection)
+                                        @if (hasActiveElection)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary px-3" style="border-radius: 8px; cursor: not-allowed;" disabled>
+                                                @(user.IsActive ? "Desactivar" : "Activar")
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            @if (user.IsActive)
                                             {
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary px-3" style="border-radius: 8px; cursor: not-allowed;" disabled>
-                                                    @(user.IsActive ? "Desactivar" : "Activar")
-                                                </button>
+                                                <a asp-action="ToggleStatus" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px;">
+                                                    Desactivar
+                                                </a>
                                             }
                                             else
                                             {
-                                                @if (user.IsActive)
-                                                {
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px;" onclick="return confirm('¿Está seguro de desactivar a este usuario?')">
-                                                        Desactivar
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    <button type="submit" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
-                                                        Activar
-                                                    </button>
-                                                }
+                                                <a asp-action="ToggleStatus" asp-route-id="@user.Id" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
+                                                    Activar
+                                                </a>
                                             }
-                                        </form>
+                                        }
                                     </div>
                                 </td>
                             </tr>

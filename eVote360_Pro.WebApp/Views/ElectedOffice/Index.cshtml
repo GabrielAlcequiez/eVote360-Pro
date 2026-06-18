@@ -112,21 +112,18 @@
                                         {
                                             <a asp-action="Edit" asp-route-id="@office.Id" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 8px;">Editar</a>
 
-                                            <form asp-action="ToggleStatus" asp-route-id="@office.Id" method="post" class="m-0">
-                                                @Html.AntiForgeryToken()
-                                                @if (office.IsActive)
-                                                {
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px;" onclick="return confirm('¿Está seguro de desactivar este puesto electivo?')">
-                                                        Desactivar
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    <button type="submit" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
-                                                        Activar
-                                                    </button>
-                                                }
-                                            </form>
+                                            @if (office.IsActive)
+                                            {
+                                                <a asp-action="ToggleStatus" asp-route-id="@office.Id" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px;">
+                                                    Desactivar
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="ToggleStatus" asp-route-id="@office.Id" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
+                                                    Activar
+                                                </a>
+                                            }
                                         }
                                     </div>
                                 </td>

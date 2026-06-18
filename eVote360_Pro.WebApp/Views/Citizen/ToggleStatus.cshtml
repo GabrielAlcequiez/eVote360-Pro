@@ -1,0 +1,64 @@
+@model eVote360_Pro.Core.Application.DTOs.Citizen.CitizenGetDto
+@{
+    ViewData["Title"] = Model.IsActive ? "Desactivar Ciudadano" : "Activar Ciudadano";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm p-4 p-md-5 text-center" style="border-radius: 20px; background: #ffffff;">
+                @if (Model.IsActive)
+                {
+                    <div class="text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h2 class="h4 font-weight-bold mb-3" style="color: #0f172a;">¿Está seguro que desea desactivar este ciudadano?</h2>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem;">
+                        Al desactivar a <strong>@Model.FullName</strong>, no podrá participar en elecciones ni emitir su voto.
+                    </p>
+                }
+                else
+                {
+                    <div class="text-success mb-3">
+                        <i class="bi bi-check-circle-fill" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h2 class="h4 font-weight-bold mb-3" style="color: #0f172a;">¿Está seguro que desea activar este ciudadano?</h2>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem;">
+                        Al activar a <strong>@Model.FullName</strong>, volverá a estar habilitado para participar en elecciones.
+                    </p>
+                }
+
+                <div class="d-flex align-items-center justify-content-center gap-3 p-3 rounded-3 mb-4" style="background-color: #f8fafc;">
+                    <div class="text-start">
+                        <div class="font-weight-bold" style="color: #0f172a; font-size: 1.05rem;">@Model.FullName</div>
+                        <div class="text-muted small mt-1">@Model.Email</div>
+                        <div class="text-muted small">Doc: @Model.DocumentNumber</div>
+                    </div>
+                </div>
+
+                <form asp-action="ToggleStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4" style="border-radius: 10px;">
+                            Cancelar
+                        </a>
+                        @if (Model.IsActive)
+                        {
+                            <button type="submit" class="btn btn-danger px-4 py-2" style="border-radius: 10px;">
+                                Desactivar Ciudadano
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-success px-4 py-2" style="border-radius: 10px;">
+                                Activar Ciudadano
+                            </button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

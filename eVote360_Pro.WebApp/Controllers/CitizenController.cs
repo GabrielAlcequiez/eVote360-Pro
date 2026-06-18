@@ -129,9 +129,26 @@ namespace eVote360_Pro.WebApp.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         public async Task<IActionResult> ToggleStatus(Guid id)
+        {
+            if (await IsElectionActiveAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden modificar ciudadanos mientras exista una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var dto = await _service.GetByIdAsync(id);
+            if (dto == null)
+                return NotFound();
+
+            return View(dto);
+        }
+
+        [HttpPost]
+        [ActionName("ToggleStatus")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatusPost(Guid id)
         {
             if (await IsElectionActiveAsync())
             {
@@ -165,7 +182,5 @@ namespace eVote360_Pro.WebApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }

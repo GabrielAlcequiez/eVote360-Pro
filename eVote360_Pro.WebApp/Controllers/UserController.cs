@@ -170,9 +170,26 @@ namespace eVote360_Pro.WebApp.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         public async Task<IActionResult> ToggleStatus(Guid id)
+        {
+            if (await IsElectionActiveAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden realizar cambios en los usuarios mientras exista una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [ActionName("ToggleStatus")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatusPost(Guid id)
         {
             if (await IsElectionActiveAsync())
             {
