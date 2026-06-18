@@ -90,7 +90,7 @@ namespace eVote360_Pro.Core.Application.Services
                 throw new InvalidOperationException("Este candidato no pertenece al partido politico del dirigente autenticado");
             
             if(await _candidateOfficeAssignmentRepository.CandidateHasOfficeAssigned(candidate.Id, candidate.PoliticalPartyId))
-                throw new InvalidOperationException("No se puede desactivar un candidato mientras exista una elección activa.");
+                throw new InvalidOperationException("No se puede desactivar un candidato mientras tenga un puesto politico activado.");
                 
             _ = await _repository.SoftDeleteAsync(id)
                 ?? throw new KeyNotFoundException("El candidato no existe");
