@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -207,7 +208,8 @@ namespace eVote360_Pro.WebApp.Controllers
 
                 if (user.IsActive)
                 {
-                    await _userService.DeleteAsync(id);
+                    var currentUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                    await _userService.DeleteAsync(id, currentUserId);
                     TempData["SuccessMessage"] = "Usuario desactivado exitosamente.";
                 }
                 else

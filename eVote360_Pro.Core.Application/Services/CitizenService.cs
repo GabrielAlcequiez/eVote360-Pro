@@ -39,6 +39,10 @@ namespace eVote360_Pro.Core.Application.Services
             if (await _electionRepository.ValidateNoActiveElectionAsync())
                 throw new InvalidOperationException("No se puede realizar esta operación mientras exista una elección activa");
 
+            var existingByEmail = await _repository.GetByEmail(dto.Email);
+            if (existingByEmail != null)
+                throw new InvalidOperationException("Ya existe un ciudadano registrado con este correo electrónico.");
+
             var citizen = new Citizen(
                 dto.Name,
                 dto.LastName,
@@ -85,6 +89,10 @@ namespace eVote360_Pro.Core.Application.Services
 
             var citizen = await _repository.GetByIdAsync(dto.Id) 
                 ?? throw new KeyNotFoundException("El ciudadano no fue encontrado");
+
+            var existingByEmail = await _repository.GetByEmail(dto.Email);
+            if (existingByEmail != null && existingByEmail.Id != dto.Id)
+                throw new InvalidOperationException("Ya existe un ciudadano registrado con este correo electrónico.");
 
             if (await _repository.HasBeenUsedInAnyElectionAsync(dto.Id))
             {

@@ -81,10 +81,24 @@ namespace eVote360_Pro.Core.Application.Services
             return _mapper.Map<UserGetDto>(user);
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id, Guid currentUserId)
         {
             if (await _electionRepository.ValidateNoActiveElectionAsync())
                 throw new InvalidOperationException("No se puede realizar esta operación mientras exista una elección activa");
+
+            if (id == currentUserId)
+                throw new InvalidOperationException("No puedes desactivarte a ti mismo.");
+
+            var target = await _userRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Usuario con ID {id} no encontrado.");
+
+            if (target.IsActive && target.Role == Role.Administrator)
+            {
+                var allUsers = await _userRepository.GetAllAsync();
+                var activeAdminCount = allUsers.Count(u => u.IsActive && u.Role == Role.Administrator);
+                if (activeAdminCount <= 1)
+                    throw new InvalidOperationException("No se puede desactivar al único administrador activo del sistema.");
+            }
 
             _ = await _userRepository.SoftDeleteAsync(id) ?? throw new KeyNotFoundException($"Usuario con ID {id} no encontrado.");
 
@@ -139,6 +153,14 @@ namespace eVote360_Pro.Core.Application.Services
             if (existingByEmail != null && existingByEmail.Id != dto.Id)
             {
                 throw new InvalidOperationException("Ya existe un usuario registrado con este correo electrónico.");
+            }
+
+            if (user.IsActive && user.Role == Role.Administrator && (!dto.IsActive || dto.Role != Role.Administrator))
+            {
+                var allUsers = await _userRepository.GetAllAsync();
+                var activeAdminCount = allUsers.Count(u => u.IsActive && u.Role == Role.Administrator);
+                if (activeAdminCount <= 1)
+                    throw new InvalidOperationException("No se puede modificar al único administrador activo del sistema.");
             }
 
             if (user.Role == Role.PoliticalLeader && dto.Role == Role.Administrator)
