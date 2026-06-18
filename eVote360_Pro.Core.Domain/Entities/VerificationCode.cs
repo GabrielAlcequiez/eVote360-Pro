@@ -18,7 +18,7 @@ namespace eVote360_Pro.Core.Domain.Entities
 
         protected VerificationCode() { }
 
-        // Constructor para la generación del código en tu servicio de seguridad
+       
         public VerificationCode(Guid citizenId, Guid electionId, string code)
         {
             Id = Guid.NewGuid();
@@ -26,18 +26,17 @@ namespace eVote360_Pro.Core.Domain.Entities
             ElectionId = electionId;
             Code = code;
             GeneratedAt = DateTime.UtcNow;
-            ExpiresAt = GeneratedAt.AddMinutes(5); // Siguiendo la vigencia estricta de 5 mins
+            ExpiresAt = GeneratedAt.AddMinutes(5); 
             IsUsed = false;
         }
 
-        // Regla de negocio: Validar y consumir el código en un solo paso
         public void Use()
         {
             if (IsUsed)
                 throw new InvalidOperationException("Este código de verificación ya fue utilizado.");
 
             if (DateTime.UtcNow > ExpiresAt)
-                throw new InvalidOperationException("El código de verificación ha expirado. Solicite un nuevo código.");
+                throw new InvalidOperationException("El código de verificación ha expirado. Solicite un nuevo código para continuar.");
 
             IsUsed = true;
         }

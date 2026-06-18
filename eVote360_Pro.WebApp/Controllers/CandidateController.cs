@@ -102,7 +102,7 @@ namespace eVote360_Pro.WebApp.Controllers
         {
             if (await IsElectionActiveAsync())
             {
-                TempData["ErrorMessage"] = "No se puede crear un candidato mientras exista una elección activa";
+                TempData["ErrorMessage"] = "No se puede editar un candidato mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
 
             }

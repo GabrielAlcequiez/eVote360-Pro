@@ -18,7 +18,7 @@ namespace eVote360_Pro.Core.Application.Services
 
         public async Task AcceptRequestAsync(Guid id, Guid currentPartyId)
         {
-            await ValidateNoActiveElectionAsync("aceptar una solicitud  de alianza");
+            await ValidateNoActiveElectionAsync("aceptar una solicitud de alianza");
             var alliance = await _politicalAllianceRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException("La solicitud de alianza seleccionada no existe o ya fue eliminada.");
 
             if (alliance.Status != AllianceStatus.Pending)
@@ -94,7 +94,7 @@ namespace eVote360_Pro.Core.Application.Services
 
         public async Task DeleteRequestAsync(Guid id, Guid currentPartyId)
         {
-            await ValidateNoActiveElectionAsync("eliminar una  solicitud de alianza");
+            await ValidateNoActiveElectionAsync("eliminar una solicitud de alianza");
 
             var alliance = await _politicalAllianceRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException("La solicitud de alianza seleccionada no existe o ya fue eliminada.");
 

@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using System.Security.Cryptography.X509Certificates;
 using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.Candidate;
 using eVote360_Pro.Core.Application.Interfaces;
@@ -54,7 +52,7 @@ namespace eVote360_Pro.Core.Application.Services
                 throw new InvalidOperationException("No puede crear candidatos porque no tiene un partido político asignado.");
 
             if (!await _partyLeaderRepository.HasActivePoliticalPartyAsync(userId))
-                throw new InvalidOperationException("No puede crear candidatos porque el partido pollitico se encuentra inactivo.");
+                throw new InvalidOperationException("No puede crear candidatos porque el partido político se encuentra inactivo.");
         
             var partyLeader = await _partyLeaderRepository.GetByIdAsync(userId)
                 ?? throw new KeyNotFoundException("Dirigente no encontrado");
@@ -84,13 +82,13 @@ namespace eVote360_Pro.Core.Application.Services
                  throw new InvalidOperationException("Este candidato ya se encuentra inactivo.");
 
             var partyLeader = await _partyLeaderRepository.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException("El dirigente politico no fue encontrado");
+                ?? throw new KeyNotFoundException("El dirigente político no fue encontrado");
                 
             if(candidate.PoliticalPartyId != partyLeader.PoliticalPartyId)
-                throw new InvalidOperationException("Este candidato no pertenece al partido politico del dirigente autenticado");
+                throw new InvalidOperationException("No tiene permisos para desactivar este candidato.");
             
             if(await _candidateOfficeAssignmentRepository.CandidateHasOfficeAssigned(candidate.Id, candidate.PoliticalPartyId))
-                throw new InvalidOperationException("No se puede desactivar un candidato mientras tenga un puesto politico activado.");
+                throw new InvalidOperationException("No se puede desactivar este candidato porque está asignado a un puesto electivo.");
                 
             _ = await _repository.SoftDeleteAsync(id)
                 ?? throw new KeyNotFoundException("El candidato no existe");
@@ -125,16 +123,16 @@ namespace eVote360_Pro.Core.Application.Services
                 throw new InvalidOperationException("No puede editar el candidato porque no tiene un partido político asignado.");
 
             if (!await _partyLeaderRepository.HasActivePoliticalPartyAsync(userId))
-                throw new InvalidOperationException("No puede editar el candidato porque el partido pollitico se encuentra inactivo.");
+                throw new InvalidOperationException("No puede editar el candidato porque el partido político se encuentra inactivo.");
        
             var candidate = await _repository.GetByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException("El ciudadano no fue encontrado");
 
             var partyLeader = await _partyLeaderRepository.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException("El dirigente politico no fue encontrado");
+                ?? throw new KeyNotFoundException("El dirigente político no fue encontrado");
 
             if(candidate.PoliticalPartyId != partyLeader.PoliticalPartyId)
-                throw new InvalidOperationException("Este candidato no pertenece al partido politico del dirigente autenticado");
+                throw new InvalidOperationException("No tiene permisos para modificar este candidato.");
             if(await _repository.HasBeenUsedInElectionAsync(dto.Id))
             {
                 if(candidate.Name != dto.Name || candidate.LastName != dto.LastName || candidate.Photo != dto.Photo)
