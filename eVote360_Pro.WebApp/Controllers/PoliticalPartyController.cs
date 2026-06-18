@@ -73,7 +73,6 @@ namespace eVote360_Pro.WebApp.Controllers
 
             try
             {
-                // 1. Crear partido con placeholder para obtener el ID
                 var createDto = new PoliticalPartyCreateDto
                 {
                     Name = model.Name,
@@ -84,7 +83,6 @@ namespace eVote360_Pro.WebApp.Controllers
 
                 var createdParty = await _partyService.AddAsync(createDto);
 
-                // 2. Subir logo con el ID generado
                 var logoPath = FileManager.Upload(model.LogoFile, createdParty.Id, "Logos");
 
                 if (string.IsNullOrEmpty(logoPath))
@@ -93,7 +91,6 @@ namespace eVote360_Pro.WebApp.Controllers
                     return View(model);
                 }
 
-                // 3. Actualizar el logo en la entidad
                 var updateDto = new PoliticalPartyUpdateDto
                 {
                     Id = createdParty.Id,
@@ -157,7 +154,6 @@ namespace eVote360_Pro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Si está bloqueado, el navegador no envía Name ni Acronym. Los recuperamos del servicio para no perderlos.
             var existingParty = await _partyService.GetByIdAsync(model.Id);
             if (existingParty == null)
             {
@@ -169,12 +165,10 @@ namespace eVote360_Pro.WebApp.Controllers
 
             if (isLocked)
             {
-                // Sobrescribimos con los valores originales de la DB para pasar validación y seguridad
                 model.Name = existingParty.Name;
                 model.Acronym = existingParty.Acronym;
                 model.Logo = existingParty.Logo;
                 
-                // Removemos del model state errores relacionados con Name/Acronym ya que no los enviará el form
                 ModelState.Remove(nameof(model.Name));
                 ModelState.Remove(nameof(model.Acronym));
             }
@@ -184,7 +178,6 @@ namespace eVote360_Pro.WebApp.Controllers
                 return View(model);
             }
 
-            // Si está bloqueado y se intenta subir un logo, rechazar
             if (isLocked && model.LogoFile != null)
             {
                 ModelState.AddModelError(string.Empty, "No se puede modificar el logo de este partido político porque ya participó en una elección.");
@@ -262,13 +255,11 @@ namespace eVote360_Pro.WebApp.Controllers
 
                 if (party.IsActive)
                 {
-                    // Desactivar: llama a DeleteAsync (que internamente hace el SoftDelete)
                     await _partyService.DeleteAsync(id);
                     TempData["SuccessMessage"] = "Partido político desactivado exitosamente.";
                 }
                 else
                 {
-                    // Activar: usa UpdateAsync con IsActive = true
                     var dto = _mapper.Map<PoliticalPartyUpdateDto>(party);
                     dto.IsActive = true;
                     await _partyService.UpdateAsync(dto);

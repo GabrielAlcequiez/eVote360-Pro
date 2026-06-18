@@ -46,15 +46,10 @@ namespace eVote360_Pro.Infrastructure.Services
             }
         }
 
-        /// <summary>
-        /// Busca dentro del texto extraído el número de cédula, normalizando caracteres típicos
-        /// y ofreciendo un fallback flexible si hay ruido en la imagen.
-        /// </summary>
         private static string? ExtractDocumentNumber(string ocrText)
         {
             if (string.IsNullOrWhiteSpace(ocrText)) return null;
 
-            // 1. Normalizar errores comunes de OCR (letras leídas por números)
             var normalizedText = ocrText
                 .Replace('O', '0')
                 .Replace('o', '0')
@@ -62,18 +57,14 @@ namespace eVote360_Pro.Infrastructure.Services
                 .Replace('i', '1')
                 .Replace('l', '1');
 
-            // 2. Intentar formato exacto con guiones
             var matchWithDashes = RegexDashes().Match(normalizedText);
             if (matchWithDashes.Success)
                 return matchWithDashes.Value.Replace("-", "");
 
-            // 3. Intentar formato exacto de 11 dígitos
             var matchDigitsOnly = RegexNumber().Match(normalizedText);
             if (matchDigitsOnly.Success)
                 return matchDigitsOnly.Value;
 
-            // 4. Fallback extremo: Remover todo lo que no sea dígito y retornar todos los dígitos juntos.
-            // Esto permite que el llamador verifique si la cédula ingresada está contenida como subcadena.
             var cleanDigits = new string(normalizedText.Where(char.IsDigit).ToArray());
             if (cleanDigits.Length >= 11)
             {

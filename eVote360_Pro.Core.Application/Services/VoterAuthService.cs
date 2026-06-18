@@ -39,17 +39,14 @@ namespace eVote360_Pro.Core.Application.Services
             if (string.IsNullOrWhiteSpace(documentNumber))
                 throw new ArgumentException("El número de documento no puede estar vacío.");
 
-            // Limpiamos los guiones para comparar con la BD
             var cleanDocument = documentNumber.Replace("-", "");
             var citizen = await _citizenRepository.GetByDocumentNumber(cleanDocument) ?? throw new InvalidOperationException("No existe un ciudadano registrado con este número de documento.");
 
             if (!citizen.IsActive)
                 throw new InvalidOperationException("Este ciudadano se encuentra inactivo y no puede participar en el proceso de votación.");
 
-            // Buscar si existe una elección activa
             var activeElection = await _electionRepository.GetActiveElectionAsync() ?? throw new InvalidOperationException("No hay ningún proceso electoral en estos momentos.");
 
-            // Verificar si el ciudadano ya votó en esta elección activa
             var alreadyVoted = await _citizenRepository.HasBeenUsedInElectionAsync(citizen.Id, activeElection.Id);
             if (alreadyVoted)
                 throw new InvalidOperationException("Ya ha ejercido su derecho al voto.");
@@ -64,30 +61,24 @@ namespace eVote360_Pro.Core.Application.Services
 
             var cleanEntered = enteredDocumentNumber.Replace("-", "");
 
-            // Extraer el texto de la cédula mediante OCR
             var extractedDocument = await _ocrService.ExtractDocumentNumberAsync(imageStream);
 
             if (string.IsNullOrWhiteSpace(extractedDocument))
                 return false;
 
             var cleanExtracted = extractedDocument.Replace("-", "");
-            // Verificar si el texto extraído (limpio) contiene la cédula ingresada (limpia)
             return cleanExtracted.Contains(cleanEntered);
         }
 
         public async Task<bool> GenerateAndSendOtpAsync(Guid citizenId, Guid electionId, string email, string name)
         {
-            // Generar código OTP de 6 dígitos aleatorio y seguro
             var code = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 
-            // Crear entidad de código (vigencia de 5 minutos configurada internamente)
             var verificationCode = new VerificationCode(citizenId, electionId, code);
 
-            // Persistir en BD
             await _verificationCodeRepository.AddAsync(verificationCode);
             await _unitOfWork.CompleteAsync();
 
-            // Enviar correo
             var emailRequest = new EmailRequest
             {
                 ToEmail = email,
@@ -119,20 +110,16 @@ namespace eVote360_Pro.Core.Application.Services
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("El código no puede estar vacío.");
 
-            // Obtener el último código no usado generado
             var verificationCode = await _verificationCodeRepository.GetLatestUnusedCodeAsync(citizenId, electionId);
 
             if (verificationCode == null)
                 throw new InvalidOperationException("No se encontró ningún código de verificación activo.");
 
-            // Validar que el código ingresado coincida
             if (!verificationCode.Code.Equals(code.Trim(), StringComparison.Ordinal))
                 throw new InvalidOperationException("El código de verificación ingresado es incorrecto.");
 
-            // Consumir el código (valida exp/uso)
             verificationCode.Use();
 
-            // Persistir cambios
             await _unitOfWork.CompleteAsync();
             return true;
         }

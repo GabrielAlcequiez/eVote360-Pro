@@ -22,15 +22,12 @@ namespace eVote360_Pro.WebApp.Controllers
         private const string SessionKeyOtpValidated = "Voter_OtpValidated";
         private const string SessionKeyDocumentNumber = "Voter_DocumentNumber";
 
-        // Paso 1: Ingreso de Cédula (GET)
         public IActionResult Index()
         {
-            // Limpiar cualquier sesión anterior del elector al cargar el inicio del flujo
             ClearVoterSession();
             return View(new VoterDocumentViewModel());
         }
 
-        // Paso 1: Ingreso de Cédula (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(VoterDocumentViewModel vm)
@@ -42,7 +39,6 @@ namespace eVote360_Pro.WebApp.Controllers
             {
                 var (citizen, election) = await _voterAuthService.VerifyCitizenEligibilityAsync(vm.DocumentNumber);
 
-                // Guardar en sesión
                 HttpContext.Session.SetString(SessionKeyCitizenId, citizen.Id.ToString());
                 HttpContext.Session.SetString(SessionKeyCitizenName, $"{citizen.Name} {citizen.LastName}");
                 HttpContext.Session.SetString(SessionKeyCitizenEmail, citizen.Email);
@@ -70,7 +66,6 @@ namespace eVote360_Pro.WebApp.Controllers
             }
         }
 
-        // Paso 2: Validación OCR (GET)
         public IActionResult UploadOcr()
         {
             var citizenIdStr = HttpContext.Session.GetString(SessionKeyCitizenId);
@@ -90,7 +85,6 @@ namespace eVote360_Pro.WebApp.Controllers
             return View(vm);
         }
 
-        // Paso 2: Validación OCR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadOcr(VoterOcrViewModel vm)
@@ -104,7 +98,6 @@ namespace eVote360_Pro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Forzar el número de documento de la sesión para evitar manipulaciones en el POST
             vm.DocumentNumber = docNumber;
 
             if (vm.DocumentImage == null || vm.DocumentImage.Length == 0)
@@ -127,10 +120,8 @@ namespace eVote360_Pro.WebApp.Controllers
                     return View(vm);
                 }
 
-                // Validación OCR correcta
                 HttpContext.Session.SetString(SessionKeyOcrValidated, "true");
 
-                // Redirigir al envío del OTP
                 return RedirectToAction(nameof(SendOtp));
             }
             catch (Exception ex)
@@ -140,7 +131,6 @@ namespace eVote360_Pro.WebApp.Controllers
             }
         }
 
-        // Envío automático de OTP y redirección (GET)
         public async Task<IActionResult> SendOtp()
         {
             var citizenIdStr = HttpContext.Session.GetString(SessionKeyCitizenId);
@@ -171,7 +161,6 @@ namespace eVote360_Pro.WebApp.Controllers
             }
         }
 
-        // Paso 3: Verificación OTP (GET)
         public IActionResult VerifyOtp()
         {
             var citizenIdStr = HttpContext.Session.GetString(SessionKeyCitizenId);
@@ -184,12 +173,10 @@ namespace eVote360_Pro.WebApp.Controllers
                 return RedirectToAction(nameof(UploadOcr));
             }
 
-            // Ocultar parcialmente el correo por privacidad (ej: j***e@gmail.com)
             ViewBag.MaskedEmail = MaskEmail(email!);
             return View(new VoterOtpViewModel());
         }
 
-        // Paso 3: Verificación OTP (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyOtp(VoterOtpViewModel vm)
@@ -223,7 +210,6 @@ namespace eVote360_Pro.WebApp.Controllers
                     HttpContext.Session.SetString(SessionKeyOtpValidated, "true");
                     TempData["SuccessMessage"] = "Identidad completamente validada. Bienvenido al proceso de votación.";
                     
-                    // Redirigir a la boleta electoral de la Persona A
                     return RedirectToAction("Index", "Ballot");
                 }
 

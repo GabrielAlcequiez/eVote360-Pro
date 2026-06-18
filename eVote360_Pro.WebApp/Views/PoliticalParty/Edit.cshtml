@@ -26,7 +26,6 @@
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="Logo" />
 
-                        <!-- Si está bloqueado, guardamos los valores originales en inputs ocultos para que se envíen en el post si el controller los requiere (o el model binding) -->
                         @if (Model.IsLocked)
                         {
                             <input type="hidden" asp-for="Name" />

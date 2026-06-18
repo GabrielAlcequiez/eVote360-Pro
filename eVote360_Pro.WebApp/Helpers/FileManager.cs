@@ -45,7 +45,7 @@ namespace eVote360_Pro.WebApp.Helpers
                     File.Delete(oldFullPath);
             }
 
-            return $"{basePath}/{fileName}";
+            return $"/{basePath}/{fileName}";
         }
 
         public static bool Delete(Guid id, string folderName)

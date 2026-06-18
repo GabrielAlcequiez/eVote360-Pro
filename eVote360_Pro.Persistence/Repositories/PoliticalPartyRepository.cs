@@ -52,11 +52,9 @@ namespace eVote360_Pro.Persistence.Repositories
 
         public async Task<bool> HasParticipatedInElectionAsync(Guid id)
         {
-            // 1. Verificar si hay votos registrados para candidatos de este partido
             var hasVotes = await _context.Votes.AnyAsync(v => v.Candidate != null && v.Candidate.PoliticalPartyId == id);
             if (hasVotes) return true;
 
-            // 2. Verificar si hay asignaciones en elecciones activas o finalizadas
             var hasActiveOrFinalizedElection = await _context.Elections.AnyAsync(e => e.Status == ElectionStatus.Active || e.Status == ElectionStatus.Finalized);
             if (hasActiveOrFinalizedElection)
             {

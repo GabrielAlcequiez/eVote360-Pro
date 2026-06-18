@@ -51,13 +51,11 @@ namespace eVote360_Pro.Core.Application.Services
 
         public async Task<DashboardGetDto> GetDashboardDataAsync(int? year = null)
         {
-            // 1. Obtener contadores básicos de Ciudadanos
             var citizens = await _citizenRepository.GetAllAsync();
             var totalCitizens = citizens.Count;
             var activeCitizens = citizens.Count(c => c.IsActive);
             var inactiveCitizens = totalCitizens - activeCitizens;
 
-            // 2. Obtener contadores básicos de Partidos y Candidatos
             var parties = await _politicalPartyRepository.GetAllAsync();
             var totalParties = parties.Count;
 
@@ -67,18 +65,14 @@ namespace eVote360_Pro.Core.Application.Services
             var offices = await _electedOfficeRepository.GetAllAsync();
             var totalOffices = offices.Count;
 
-            // 3. Obtener contadores básicos de Usuarios
             var users = await _userRepository.GetAllAsync();
             var totalUsers = users.Count;
             var activeUsers = users.Count(u => u.IsActive);
 
-            // 4. Obtener Elección Activa o Última Finalizada
             var elections = await _electionRepository.GetAllAsync();
             
-            // Buscar la elección activa
             var activeElection = elections.FirstOrDefault(e => e.Status == ElectionStatus.Active);
-            
-            // Si no hay elección activa, buscar la última finalizada para mostrar resultados históricos
+
             var latestFinalizedElection = elections
                 .Where(e => e.Status == ElectionStatus.Finalized)
                 .OrderByDescending(e => e.ScheduledDate)
@@ -110,7 +104,6 @@ namespace eVote360_Pro.Core.Application.Services
                 targetElectionForResults = latestFinalizedElection;
             }
 
-            // 5. Cargar participación y resultados si hay una elección disponible
             var participations = await _participationRepository.GetAllAsync();
             if (targetElectionForResults != null)
             {
@@ -123,12 +116,10 @@ namespace eVote360_Pro.Core.Application.Services
                     ? Math.Round((decimal)votedCount / totalCitizens * 100, 1)
                     : 0;
 
-                // Cargar resultados agregados utilizando el servicio de elecciones existente
                 var results = await _electionService.GetElectionResultsAsync(targetElectionForResults.Id);
                 dto.ElectionResults = results ?? new();
             }
 
-            // 6. Resumen electoral por año
             var availableYears = elections
                 .Select(e => e.ScheduledDate.Year)
                 .Distinct()
@@ -173,19 +164,15 @@ namespace eVote360_Pro.Core.Application.Services
 
             var partyId = leader.PoliticalPartyId;
 
-            // 1. Cantidad de candidatos activos e inactivos del partido
             var candidates = await _candidateRepository.GetAllAsync();
             var activeCandidatesCount = candidates.Count(c => c.PoliticalPartyId == partyId && c.IsActive);
             var inactiveCandidatesCount = candidates.Count(c => c.PoliticalPartyId == partyId && !c.IsActive);
 
-            // 2. Alianzas políticas aprobadas (estado Aceptada)
             var alliances = await _politicalAllianceRepository.GetAllByPartyIdWithDetailsAsync(partyId);
             var alliancesCount = alliances.Count(a => a.Status == AllianceStatus.Accepted);
 
-            // 3. Solicitudes de alianza pendientes dirigidas al partido del dirigente (receiver)
             var pendingAlliancesCount = alliances.Count(a => a.Status == AllianceStatus.Pending && a.ReceiverPartyId == partyId);
 
-            // 4. Cantidad de candidatos asignados a puestos electivos
             var assignments = await _candidateOfficeAssignmentRepository.GetActiveCandidateOfficeAssignmentsAsync();
             var assignedCandidatesCount = assignments.Count(a => a.Candidate.PoliticalPartyId == partyId);
 

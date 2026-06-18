@@ -218,8 +218,9 @@ namespace eVote360_Pro.Core.Application.Services
                     .OrderByDescending(c => c.VoteCount)
                     .ToList();
 
-                var maxVotes = candidates.FirstOrDefault()?.VoteCount;
-                var topCandidates = candidates.Where(c => c.VoteCount == maxVotes && maxVotes > 0).ToList();
+                var realCandidates = candidates.Where(c => c.CandidateName != "Ninguno").ToList();
+                var maxVotes = realCandidates.FirstOrDefault()?.VoteCount;
+                var topCandidates = realCandidates.Where(c => c.VoteCount == maxVotes && maxVotes > 0).ToList();
 
                 if (topCandidates.Count == 1)
                 {

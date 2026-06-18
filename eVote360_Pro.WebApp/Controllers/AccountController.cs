@@ -111,11 +111,11 @@ namespace eVote360_Pro.WebApp.Controllers
             var roleClaim = role ?? User.FindFirst(ClaimTypes.Role)?.Value;
             if (roleClaim == Role.Administrator.ToString())
             {
-                return RedirectToAction("Index", "Home"); // TODO Panel ADmin
+                return RedirectToAction("Index", "Home");
             }
             else if (roleClaim == Role.PoliticalLeader.ToString())
             {
-                return RedirectToAction("Index", "Home"); // Todo HOme dirigente
+                return RedirectToAction("Index", "Home");
             }
 
             return RedirectToAction("Index", "Home");
