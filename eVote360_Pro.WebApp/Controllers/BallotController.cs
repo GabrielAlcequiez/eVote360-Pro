@@ -11,7 +11,7 @@ namespace eVote360_Pro.WebApp.Controllers
     public class BallotController : Controller
     {
         private readonly IBallotService _ballotService;
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionService _electionService;
         private readonly IMapper _mapper;
 
         private const string SessionKeyCitizenId = "Voter_CitizenId";
@@ -22,10 +22,10 @@ namespace eVote360_Pro.WebApp.Controllers
         private const string SessionKeyOtpValidated = "Voter_OtpValidated";
         private const string SessionKeySelections = "Ballot_Selections";
 
-        public BallotController(IBallotService ballotService, IElectionRepository electionRepository, IMapper mapper)
+        public BallotController(IBallotService ballotService, IElectionService electionService, IMapper mapper)
         {
             _ballotService = ballotService;
-            _electionRepository = electionRepository;
+            _electionService = electionService;
             _mapper = mapper;
         }
 
@@ -157,7 +157,7 @@ namespace eVote360_Pro.WebApp.Controllers
 
             try
             {
-                var election = await _electionRepository.GetByIdAsync(electionId);
+                var election = await _electionService.GetByIdAsync(electionId);
                 var electionName = election?.Name ?? "Elección";
                 var electionDate = election?.ScheduledDate ?? DateTime.Today;
 

@@ -1,27 +1,22 @@
 using System.Security.Claims;
 using eVote360_Pro.Core.Application.Interfaces;
 using eVote360_Pro.Core.Domain.Common.Enums;
-using eVote360_Pro.Core.Domain.Entities;
-using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.WebApp.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace eVote360_Pro.WebApp.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IUserService _userService;
-        private readonly IUserRepository _userRepository;
-        private readonly IBaseRepository<PartyLeader> _partyLeaderRepository;
+        private readonly IPartyLeaderService _partyLeaderService;
 
-        public AccountController(IUserService userService, IUserRepository userRepository, IBaseRepository<PartyLeader> partyLeaderRepository)
+        public AccountController(IUserService userService, IPartyLeaderService partyLeaderService)
         {
             _userService = userService;
-            _userRepository = userRepository;
-            _partyLeaderRepository = partyLeaderRepository;
+            _partyLeaderService = partyLeaderService;
         }
 
 
@@ -48,7 +43,7 @@ namespace eVote360_Pro.WebApp.Controllers
             var user = await _userService.LoginAsync(model.Username, model.Password);
             if (user == null)
             {
-                var dbUser = await _userRepository.GetByUsernameAsync(model.Username.Trim());
+                var dbUser = await _userService.GetByUsernameAsync(model.Username);
                 if (dbUser != null && !dbUser.IsActive)
                 {
                     ModelState.AddModelError(string.Empty, "El Usuario esta inactivo");
@@ -62,9 +57,7 @@ namespace eVote360_Pro.WebApp.Controllers
 
             if (user.Role == Role.PoliticalLeader)
             {
-                var leaderInfo = await _partyLeaderRepository.AsQueryable()
-                    .Include(x => x.PoliticalParty)
-                    .FirstOrDefaultAsync(x => x.UserId == user.Id);
+                var leaderInfo = await _partyLeaderService.GetByUserIdAsync(user.Id);
 
                 if (leaderInfo == null)
                 {
@@ -72,7 +65,7 @@ namespace eVote360_Pro.WebApp.Controllers
 
                     return View(model);
                 }
-                if (!leaderInfo.PoliticalParty.IsActive)
+                if (!leaderInfo.PoliticalPartyIsActive)
                 {
                     ModelState.AddModelError(string.Empty, "El partido político asignado a este usuario se encuentra inactivo.");
                     return View(model);

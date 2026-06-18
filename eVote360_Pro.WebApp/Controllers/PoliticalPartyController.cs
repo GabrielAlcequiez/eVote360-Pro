@@ -16,16 +16,16 @@ namespace eVote360_Pro.WebApp.Controllers
     public class PoliticalPartyController : Controller
     {
         private readonly IPoliticalPartyService _partyService;
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionStatusService _electionStatus;
         private readonly IMapper _mapper;
 
         public PoliticalPartyController(
             IPoliticalPartyService partyService,
-            IElectionRepository electionRepository,
+            IElectionStatusService electionStatus,
             IMapper mapper)
         {
             _partyService = partyService;
-            _electionRepository = electionRepository;
+            _electionStatus = electionStatus;
             _mapper = mapper;
         }
 
@@ -33,7 +33,7 @@ namespace eVote360_Pro.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var parties = await _partyService.GetAllAsync();
-            var hasActiveElection = await _electionRepository.ValidateNoActiveElectionAsync();
+            var hasActiveElection = await _electionStatus.HasActiveElectionAsync();
 
             var viewModel = new PoliticalPartyIndexViewModel
             {
@@ -47,7 +47,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede crear un partido político mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -60,7 +60,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PoliticalPartyCreateViewModel model)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede crear un partido político mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -119,7 +119,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede editar un partido político mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -151,7 +151,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PoliticalPartyUpdateViewModel model)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede editar un partido político mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -226,7 +226,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> ToggleStatus(Guid id)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se pueden realizar cambios mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -246,7 +246,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatusPost(Guid id)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se pueden realizar cambios mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));

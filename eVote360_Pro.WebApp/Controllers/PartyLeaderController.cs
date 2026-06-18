@@ -13,22 +13,22 @@ namespace eVote360_Pro.WebApp.Controllers
     public class PartyLeaderController : Controller
     {
         private readonly IPartyLeaderService _partyLeaderService;
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionStatusService _electionStatus;
         private readonly IMapper _mapper;
 
         public PartyLeaderController(
             IPartyLeaderService partyLeaderService,
-            IElectionRepository electionRepository,
+            IElectionStatusService electionStatus,
             IMapper mapper)
         {
             _partyLeaderService = partyLeaderService;
-            _electionRepository = electionRepository;
+            _electionStatus = electionStatus;
             _mapper = mapper;
         }
 
         private async Task<bool> IsElectionActiveAsync()
         {
-            return await _electionRepository.ValidateNoActiveElectionAsync();
+            return await _electionStatus.HasActiveElectionAsync();
         }
 
         public async Task<IActionResult> Index()

@@ -72,6 +72,17 @@ namespace eVote360_Pro.Core.Application.Services
             return _mapper.Map<List<UserGetDto>>(users);
         }
 
+        public async Task<PartyLeaderGetDto?> GetByUserIdAsync(Guid userId)
+        {
+            var leader = await _partyLeaderRepository.GetPartyLeaderDetailsAsync(userId);
+            return leader == null ? null : _mapper.Map<PartyLeaderGetDto>(leader);
+        }
+
+        public async Task<bool> HasActivePartyAssignmentAsync(Guid userId)
+        {
+            return await _partyLeaderRepository.HasActivePoliticalPartyAsync(userId);
+        }
+
         public async Task<List<PoliticalPartyGetDto>> GetAvailablePartiesAsync()
         {
             var parties = await _partyLeaderRepository.GetAvailablePartiesAsync();

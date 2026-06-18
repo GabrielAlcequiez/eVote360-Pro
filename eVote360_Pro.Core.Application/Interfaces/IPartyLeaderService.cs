@@ -15,5 +15,7 @@ namespace eVote360_Pro.Core.Application.Interfaces
         Task<List<PoliticalPartyGetDto>> GetAvailablePartiesAsync();
         Task AssignAsync(PartyLeaderCreateDto dto);
         Task DeleteAsync(Guid userId);
+        Task<PartyLeaderGetDto?> GetByUserIdAsync(Guid userId);
+        Task<bool> HasActivePartyAssignmentAsync(Guid userId);
     }
 }

@@ -1,22 +1,20 @@
 using System.Security.Claims;
 using eVote360_Pro.Core.Application.DTOs.PoliticalAlliance;
 using eVote360_Pro.Core.Application.Interfaces;
-using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.WebApp.Models.PoliticalAlliance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace eVote360_Pro.WebApp.Controllers
 {
     [Authorize(Roles = "PoliticalLeader")]
-    public class PoliticalAllianceController(IPoliticalAllianceService politicalAllianceService, IElectionRepository electionRepository, IBaseRepository<PartyLeader> partyLeaderRepository) : Controller
+    public class PoliticalAllianceController(IPoliticalAllianceService politicalAllianceService, IElectionStatusService electionStatus, IPartyLeaderService partyLeaderService) : Controller
     {
         private readonly IPoliticalAllianceService _politicalAllianceService = politicalAllianceService;
-        private readonly IElectionRepository _electionRepository = electionRepository;
-        private readonly IBaseRepository<PartyLeader> _partyLeaderRepository = partyLeaderRepository;
+        private readonly IElectionStatusService _electionStatus = electionStatus;
+        private readonly IPartyLeaderService _partyLeaderService = partyLeaderService;
 
         public async Task<IActionResult> Index()
         {
@@ -29,7 +27,7 @@ namespace eVote360_Pro.WebApp.Controllers
                 PendingRequest = await _politicalAllianceService.GetPendingRequestAsync(currentPartyId.Value),
                 SentRequests = await _politicalAllianceService.GetSentRequestAsync(currentPartyId.Value),
                 ActiveAlliance = await _politicalAllianceService.GetActiveAllianceAsync(currentPartyId.Value),
-                HasActiveElection = await _electionRepository.ValidateNoActiveElectionAsync()
+                HasActiveElection = await _electionStatus.HasActiveElectionAsync()
             };
 
             return View(vm);
@@ -37,7 +35,7 @@ namespace eVote360_Pro.WebApp.Controllers
 
         public async Task<IActionResult> Create()
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede crear una solicitud de alianza mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -55,7 +53,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PoliticalAllianceCreateViewModel vm)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede crear una solicitud de alianza mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -209,9 +207,7 @@ namespace eVote360_Pro.WebApp.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return null;
 
-            var leader = await _partyLeaderRepository.AsQueryable()
-                .FirstOrDefaultAsync(pl => pl.UserId == userId);
-
+            var leader = await _partyLeaderService.GetByUserIdAsync(userId);
             return leader?.PoliticalPartyId;
         }
 

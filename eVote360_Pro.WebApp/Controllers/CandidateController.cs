@@ -14,12 +14,12 @@ namespace eVote360_Pro.WebApp.Controllers
     public class CandidateController : Controller
     {
 
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionStatusService _electionStatus;
         private readonly ICandidateService _service;
         private readonly IMapper _mapper;
-        public CandidateController(IElectionRepository electionRepository, ICandidateService service, IMapper mapper)
+        public CandidateController(IElectionStatusService electionStatus, ICandidateService service, IMapper mapper)
         {
-            _electionRepository = electionRepository;
+            _electionStatus = electionStatus;
             _service = service;
             _mapper = mapper;
         }
@@ -34,7 +34,7 @@ namespace eVote360_Pro.WebApp.Controllers
 
         private async Task<bool> IsElectionActiveAsync()
         {
-            return await _electionRepository.ValidateNoActiveElectionAsync();
+            return await _electionStatus.HasActiveElectionAsync();
         }
 
         public async Task<ActionResult> Create()
@@ -178,7 +178,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> ToggleStatus(Guid id)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se pueden realizar cambios mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -198,7 +198,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatusPost(Guid id)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se pueden realizar cambios mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));

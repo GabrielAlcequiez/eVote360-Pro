@@ -11,19 +11,19 @@ namespace eVote360_Pro.WebApp.Controllers
     [Authorize(Roles = "Administrator")]
     public class CitizenController : Controller
     {
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionStatusService _electionStatus;
         private readonly ICitizenService _service;
         private readonly IMapper _mapper;
 
-        public CitizenController(IElectionRepository electionRepository, ICitizenService service, IMapper mapper)
+        public CitizenController(IElectionStatusService electionStatus, ICitizenService service, IMapper mapper)
         {
-            _electionRepository = electionRepository;
+            _electionStatus = electionStatus;
             _service = service;
             _mapper = mapper;
         }
         private async Task<bool> IsElectionActiveAsync()
         {
-            return await _electionRepository.ValidateNoActiveElectionAsync();
+            return await _electionStatus.HasActiveElectionAsync();
         }
 
         public async Task<IActionResult> Index()

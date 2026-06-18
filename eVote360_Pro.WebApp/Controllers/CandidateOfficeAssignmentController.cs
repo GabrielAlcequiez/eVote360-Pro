@@ -2,13 +2,11 @@ using System.Security.Claims;
 using AutoMapper;
 using eVote360_Pro.Core.Application.DTOs.CandidateOfficeAssignment;
 using eVote360_Pro.Core.Application.Interfaces;
-using eVote360_Pro.Core.Domain.Entities;
 using eVote360_Pro.Core.Domain.Interfaces;
 using eVote360_Pro.WebApp.Models.CandidateOfficeAssignment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace eVote360_Pro.WebApp.Controllers
 {
@@ -16,19 +14,19 @@ namespace eVote360_Pro.WebApp.Controllers
     public class CandidateOfficeAssignmentController : Controller
     {
         private readonly ICandidateOfficeAssignmentService _service;
-        private readonly IElectionRepository _electionRepository;
-        private readonly IBaseRepository<PartyLeader> _partyLeaderRepository;
+        private readonly IElectionStatusService _electionStatus;
+        private readonly IPartyLeaderService _partyLeaderService;
         private readonly IMapper _mapper;
 
         public CandidateOfficeAssignmentController(
             ICandidateOfficeAssignmentService service,
-            IElectionRepository electionRepository,
-            IBaseRepository<PartyLeader> partyLeaderRepository,
+            IElectionStatusService electionStatus,
+            IPartyLeaderService partyLeaderService,
             IMapper mapper)
         {
             _service = service;
-            _electionRepository = electionRepository;
-            _partyLeaderRepository = partyLeaderRepository;
+            _electionStatus = electionStatus;
+            _partyLeaderService = partyLeaderService;
             _mapper = mapper;
         }
 
@@ -40,13 +38,13 @@ namespace eVote360_Pro.WebApp.Controllers
 
             var assignments = await _service.GetAllAssignmentsAsync(userId.Value);
             var vm = _mapper.Map<List<CandidateOfficeAssignmentGetViewModel>>(assignments.ToList());
-            ViewBag.HasActiveElection = await _electionRepository.ValidateNoActiveElectionAsync();
+            ViewBag.HasActiveElection = await _electionStatus.HasActiveElectionAsync();
             return View(vm);
         }
 
         public async Task<IActionResult> Create()
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede asignar candidatos a puestos mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -65,7 +63,7 @@ namespace eVote360_Pro.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CandidateOfficeAssignmentCreateViewModel vm)
         {
-            if (await _electionRepository.ValidateNoActiveElectionAsync())
+            if (await _electionStatus.HasActiveElectionAsync())
             {
                 TempData["ErrorMessage"] = "No se puede asignar candidatos a puestos mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
@@ -169,9 +167,7 @@ namespace eVote360_Pro.WebApp.Controllers
             var userId = GetCurrentUserId();
             if (userId == null) return null;
 
-            var leader = await _partyLeaderRepository.AsQueryable()
-                .FirstOrDefaultAsync(pl => pl.UserId == userId.Value);
-
+            var leader = await _partyLeaderService.GetByUserIdAsync(userId.Value);
             return leader?.PoliticalPartyId;
         }
 

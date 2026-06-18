@@ -16,20 +16,20 @@ namespace eVote360_Pro.WebApp.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionStatusService _electionStatus;
         private readonly IMapper _mapper;
         private readonly IValidator<UserCreateDto> _createValidator;
         private readonly IValidator<UserUpdateDto> _updateValidator;
 
         public UserController(
             IUserService userService,
-            IElectionRepository electionRepository,
+            IElectionStatusService electionStatus,
             IMapper mapper,
             IValidator<UserCreateDto> createValidator,
             IValidator<UserUpdateDto> updateValidator)
         {
             _userService = userService;
-            _electionRepository = electionRepository;
+            _electionStatus = electionStatus;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
@@ -37,7 +37,7 @@ namespace eVote360_Pro.WebApp.Controllers
 
         private async Task<bool> IsElectionActiveAsync()
         {
-            return await _electionRepository.ValidateNoActiveElectionAsync();
+            return await _electionStatus.HasActiveElectionAsync();
         }
 
         [HttpGet]

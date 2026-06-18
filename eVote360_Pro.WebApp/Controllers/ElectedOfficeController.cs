@@ -12,22 +12,22 @@ namespace eVote360_Pro.WebApp.Controllers
     public class ElectedOfficeController : Controller
     {
         private readonly IElectedOfficeService _service;
-        private readonly IElectionRepository _electionRepository;
+        private readonly IElectionStatusService _electionStatus;
         private readonly IMapper _mapper;
 
         public ElectedOfficeController(
             IElectedOfficeService service,
-            IElectionRepository electionRepository,
+            IElectionStatusService electionStatus,
             IMapper mapper)
         {
             _service = service;
-            _electionRepository = electionRepository;
+            _electionStatus = electionStatus;
             _mapper = mapper;
         }
 
         private async Task<bool> IsElectionActiveAsync()
         {
-            return await _electionRepository.ValidateNoActiveElectionAsync();
+            return await _electionStatus.HasActiveElectionAsync();
         }
 
         public async Task<IActionResult> Index()

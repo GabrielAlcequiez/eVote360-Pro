@@ -119,6 +119,14 @@ namespace eVote360_Pro.Core.Application.Services
             return _mapper.Map<UserGetDto>(user);
         }
 
+        public async Task<UserGetDto?> GetByUsernameAsync(string username)
+        {
+            var user = await _userRepository.GetByUsernameAsync(username.Trim());
+            if (user == null) return null;
+
+            return _mapper.Map<UserGetDto>(user);
+        }
+
         public async Task<UserGetDto?> LoginAsync(string username, string password)
         {
             var cleanUsername = username.Trim();
